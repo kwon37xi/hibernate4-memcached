@@ -6,14 +6,12 @@ buildscript {
 
 ext {
     javaVersion = '1.6'
-
-    hibernateVersion = '4.2.12.Final'
 }
 
 subprojects {
     apply plugin: 'java'
 
-    group = 'kr.pe.kwonnam.hibernate4-memcached'
+    group = 'kr.pe.kwonnam.hibernate4memcached'
     version = '0.1-SNAPSHOT'
 
     repositories {
@@ -33,5 +31,73 @@ subprojects {
 
     tasks.withType(Compile) {
         options.encoding = 'UTF-8'
+    }
+}
+
+configure(subprojects.findAll { ['hibernate4-memcached-core', 'hibernate4-memcached-spymemcached-adapter'].contains(it.name) }) {
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+
+    // from http://central.sonatype.org/pages/gradle.html
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    signing {
+        sign configurations.archives
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name "${project.name}"
+                    packaging 'jar'
+                    description 'hibernate4 memcached L2 cache implementation.'
+                    url 'https://github.com/kwon37xi/hibernate4-memcached'
+
+                    scm {
+                        connection 'scm:git:https://github.com/kwon37xi/hibernate4-memcached.git'
+                        url 'https://github.com/kwon37xi/hibernate4-memcached'
+                    }
+
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'kwon37xi'
+                            name 'KwonNam Son'
+                            email 'kwon37xi@gmail.com'
+                        }
+                    }
+                }
+            }
+        }
     }
 }

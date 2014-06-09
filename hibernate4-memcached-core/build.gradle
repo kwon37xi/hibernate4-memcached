@@ -1,3 +1,6 @@
+ext {
+    hibernateVersion = '4.2.12.Final'
+}
 
 dependencies {
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
