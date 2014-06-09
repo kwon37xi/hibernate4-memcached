@@ -3,12 +3,12 @@ package kr.pe.kwonnam.hibernate4memcached.example;
 import kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory;
 import kr.pe.kwonnam.hibernate4memcached.example.entity.Author;
 import kr.pe.kwonnam.hibernate4memcached.example.entity.Book;
-import kr.pe.kwonnam.hibernate4memcached.example.testcache.CachingRegionFactory;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.KryoTranscoder;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter;
 import net.spy.memcached.DefaultHashAlgorithm;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.cfg.Environment;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,6 @@ import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.io.Console;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,8 @@ public class CacheTest {
 
     public static final Logger log = LoggerFactory.getLogger(CacheTest.class);
 
-    public static void main(String[] args) {
+    @Test
+    public void testHibernateCache() {
 
 //        populateEntityManagerFactory();
         populateMemcachedEntityManagerFactory();
