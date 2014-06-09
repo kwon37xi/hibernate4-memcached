@@ -1,0 +1,15 @@
+ext {
+    spyMemcachedVersion = '2.11.2'
+    kryoVersion = '2.24.0'
+    kryoSerializersVersion = '0.26'
+    commonsCodecVersion = '1.9'
+}
+
+dependencies {
+    compile project(':hibernate4-memcached-core')
+    compile "net.spy:spymemcached:${spyMemcachedVersion}"
+    compile "com.esotericsoftware.kryo:kryo:${kryoVersion}"
+    compile "de.javakaffee:kryo-serializers:${kryoSerializersVersion}"
+    compile "commons-codec:commons-codec:${commonsCodecVersion}"
+
+}

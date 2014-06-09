@@ -1,0 +1,4 @@
+rootProject.name = 'hibernate4-memcached'
+include 'hibernate4-memcached-core'
+include 'hibernate4-memcached-spymemcached-adapter'
+include 'hibernate4-memcached-example'

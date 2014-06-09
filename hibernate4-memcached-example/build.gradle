@@ -1,0 +1,6 @@
+dependencies {
+    compile project(':hibernate4-memcached-spymemcached-adapter')
+    compile 'org.hibernate:hibernate-entitymanager:4.2.12.Final'
+    compile 'mysql:mysql-connector-java:5.1.30'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+}

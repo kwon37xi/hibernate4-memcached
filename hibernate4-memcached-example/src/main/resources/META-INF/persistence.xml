@@ -1,0 +1,27 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+    <persistence-unit name="cachetest" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>kr.pe.kwonnam.hibernate4memcached.example.entity.Author</class>
+        <class>kr.pe.kwonnam.hibernate4memcached.example.entity.Book</class>
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=utf8"/>
+            <property name="javax.persistence.jdbc.user" value="root"/>
+            <property name="javax.persistence.jdbc.password" value="root"/>
+
+            <property name="h4m.expiry.seconds" value="600" /> <!-- 10 minutes -->
+            <property name="h4m.expiry.seconds.cachetest.org.hibernate.cache.spi.UpdateTimestampsCache" value="2592000" /> <!-- 30 days -->
+            <property name="h4m.expiry.seconds.cachetest.org.hibernate.cache.internal.StandardQueryCache" value="2592000" /> <!-- 30 days -->
+            <property name="h4m.expiry.seconds.cachetest.books" value="3600" /> <!-- 30 days -->
+            <property name="h4m.expiry.seconds.cachetest.authors" value="1800" /> <!-- 30 days -->
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -1,0 +1,7 @@
+
+dependencies {
+    compile "org.hibernate:hibernate-core:${hibernateVersion}"
+
+    testCompile "org.hibernate:hibernate-testing:${hibernateVersion}"
+    testCompile "org.hibernate:hibernate-ehcache:${hibernateVersion}"
+}
