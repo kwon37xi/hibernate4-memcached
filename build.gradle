@@ -10,6 +10,7 @@ ext {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'jacoco'
 
     group = 'kr.pe.kwonnam.hibernate4memcached'
     version = '0.1-SNAPSHOT'
@@ -24,6 +25,8 @@ subprojects {
         testCompile 'junit:junit:4.11'
         testCompile 'org.mockito:mockito-core:1.9.5'
         testCompile 'org.easytesting:fest-assert-core:2.0M10'
+        testCompile 'ch.qos.logback:logback-classic:1.1.2'
+
     }
 
     sourceCompatibility = javaVersion
@@ -31,6 +34,16 @@ subprojects {
 
     tasks.withType(Compile) {
         options.encoding = 'UTF-8'
+    }
+
+    jacoco {
+        toolVersion = '0.7.1.201405082137'
+    }
+
+    test {
+        jacoco {
+            enabled = true
+        }
     }
 }
 

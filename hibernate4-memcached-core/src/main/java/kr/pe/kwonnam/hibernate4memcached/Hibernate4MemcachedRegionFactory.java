@@ -63,7 +63,7 @@ public class Hibernate4MemcachedRegionFactory implements RegionFactory {
         memcachedTimestamper = new MemcachedTimestamper(settings, properties, memcachedAdapter);
     }
 
-    private MemcachedAdapter populateMemcachedProvider(Properties properties) {
+    MemcachedAdapter populateMemcachedProvider(Properties properties) {
         String adapterClass = getRequiredProeprties(properties, MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY);
 
         MemcachedAdapter adapter = null;
