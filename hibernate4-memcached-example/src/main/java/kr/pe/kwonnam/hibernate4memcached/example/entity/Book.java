@@ -1,12 +1,9 @@
 package kr.pe.kwonnam.hibernate4memcached.example.entity;
 
-import org.hibernate.annotations.*;
-import org.hibernate.cfg.Environment;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -26,6 +23,7 @@ import java.util.Date;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "books")
 public class Book implements Serializable {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id")
@@ -36,13 +34,21 @@ public class Book implements Serializable {
 
     @Column(name = "description", length = 1024, nullable = false)
     private String description;
+//
+    @Column(name="test", nullable = true)
+    private String test = "hello";
 
     @Column(name = "edition", nullable = false)
     private int edition = 1;
 
+    @Lob
+    @Column(name="contents", nullable = true, length = 60000)
+    private String contents;
+
     @ManyToMany
     @JoinTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id", referencedColumnName = "author_id"))
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     public Collection<Author> authors;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -79,6 +85,14 @@ public class Book implements Serializable {
 
     public void setEdition(int edition) {
         this.edition = edition;
+    }
+
+    public String getContents() {
+        return contents;
+    }
+
+    public void setContents(String contents) {
+        this.contents = contents;
     }
 
     public Collection<Author> getAuthors() {

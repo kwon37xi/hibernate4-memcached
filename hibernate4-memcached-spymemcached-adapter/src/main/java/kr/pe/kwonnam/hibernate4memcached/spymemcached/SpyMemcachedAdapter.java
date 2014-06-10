@@ -33,6 +33,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
 
     public static final int MAX_MEMCACHED_KEY_SIZE = 250;
     public static final int DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS = 60 * 60 * 24 * 30; // Memcached는 MAX_EXPIRY_SECONDS는 30 days를 넘을 수 없다.
+    public static final String REGION_NAME_SQUENCE_SEPARATOR = "@";
 
     private Logger log = LoggerFactory.getLogger(SpyMemcachedAdapter.class);
 
@@ -113,12 +114,12 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
 
         String regionNameSequenceKey = getRegionNameSequenceKey(cacheNamespace);
         Long sequence = memcachedClient.incr(regionNameSequenceKey, 0L, 1L, DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS);
-        return cacheNamespace.getRegionName() + "#" + sequence;
+        return cacheNamespace.getRegionName() + REGION_NAME_SQUENCE_SEPARATOR + sequence;
     }
 
 
     String getRegionNameSequenceKey(CacheNamespace cacheNamespace) {
-        return cacheNamespace.getRegionName() + "#";
+        return cacheNamespace.getRegionName() + REGION_NAME_SQUENCE_SEPARATOR;
     }
 
     protected String hashKey(String key) {
@@ -138,8 +139,8 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     @Override
     public void set(CacheNamespace cacheNamespace, String key, Object value, int expirySeconds) {
         String regionPrefixedKey = createRegionPrefixedKey(cacheNamespace, key);
-        log.debug("Spymemcached Set key [{}], value [{}], expirySeconds [{}] .", regionPrefixedKey, value, expirySeconds);
 
+        log.debug("Spymemcached Set key [{}], value [{}], expirySeconds [{}] .", regionPrefixedKey, value, expirySeconds);
         memcachedClient.set(regionPrefixedKey, expirySeconds, value);
     }
 
@@ -154,11 +155,11 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     @Override
     public void evictAll(CacheNamespace cacheNamespace) {
         if (!cacheNamespace.isRegionExpirationRequired()) {
-            // do nothing
-            log.debug("Memcache region Evict {} requested but did nothing because regionExpirationRequired == false.", cacheNamespace);
+            log.debug("Spymemcached region Evict {} requested but did nothing because regionExpirationRequired == false.", cacheNamespace);
+            return;
         }
 
         long nextSequence = memcachedClient.incr(getRegionNameSequenceKey(cacheNamespace), 1, 1L, DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS);
-        log.debug("Memcache region Evicted {}, nextSequence {}", cacheNamespace, nextSequence);
+        log.debug("Spymemcached region Evicted {}, nextSequence {}", cacheNamespace, nextSequence);
     }
 }

@@ -6,6 +6,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <class>kr.pe.kwonnam.hibernate4memcached.example.entity.Author</class>
         <class>kr.pe.kwonnam.hibernate4memcached.example.entity.Book</class>
+        <shared-cache-mode>NONE</shared-cache-mode>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="validate"/>
