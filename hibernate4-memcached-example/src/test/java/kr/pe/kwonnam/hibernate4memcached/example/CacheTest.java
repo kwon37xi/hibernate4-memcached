@@ -7,6 +7,7 @@ import kr.pe.kwonnam.hibernate4memcached.spymemcached.KryoTranscoder;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter;
 import net.spy.memcached.DefaultHashAlgorithm;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Environment;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -257,6 +258,7 @@ public class CacheTest {
         props.put(Environment.CACHE_REGION_FACTORY, Hibernate4MemcachedRegionFactory.class.getName());
         props.put(Environment.CACHE_REGION_PREFIX, "cachetest");
         props.put(Environment.HBM2DDL_AUTO, "create-drop");
+        props.put(Environment.USE_STRUCTURED_CACHE, "false");
         props.put(Hibernate4MemcachedRegionFactory.MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY, SpyMemcachedAdapter.class.getName());
         props.put(SpyMemcachedAdapter.HOST_PROPERTY_KEY, "localhost:11211");
         props.put(SpyMemcachedAdapter.HASH_ALGORITHM_PROPERTY_KEY, DefaultHashAlgorithm.KETAMA_HASH.name());

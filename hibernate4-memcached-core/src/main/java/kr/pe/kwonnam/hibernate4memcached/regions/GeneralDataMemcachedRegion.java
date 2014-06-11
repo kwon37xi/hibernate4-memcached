@@ -1,6 +1,5 @@
 package kr.pe.kwonnam.hibernate4memcached.regions;
 
-import kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory;
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.util.MemcachedTimestamper;
@@ -47,26 +46,30 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
 
     @Override
     public Object get(Object key) throws CacheException {
-        log.debug("Cache[{}] lookup : key[{}]", getCacheNamespace(), key);
+        Object cachedData = getMemcachedAdapter().get(getCacheNamespace(), String.valueOf(key));
 
-        return getMemcachedAdapter().get(getCacheNamespace(), String.valueOf(key));
+        if (cachedData == null) {
+            return null;
+        }
+
+        return cachedData;
     }
 
     @Override
     public void put(Object key, Object value) throws CacheException {
-        log.debug("Cache[{}] put : key[{}]", getCacheNamespace(), key);
+        log.debug("Cache put [{}] : key[{}], value[{}]", getCacheNamespace(), key, value);
         getMemcachedAdapter().set(getCacheNamespace(), String.valueOf(key), value, getExpiryInSeconds());
     }
 
     @Override
     public void evict(Object key) throws CacheException {
-        log.debug("Cache[{}] evictAll : key[{}]", getCacheNamespace(), key);
+        log.debug("Cache evictAll [{}] : key[{}]", getCacheNamespace(), key);
         getMemcachedAdapter().delete(getCacheNamespace(), String.valueOf(key));
     }
 
     @Override
     public void evictAll() throws CacheException {
-        log.debug("Cache[{}] evictAll all.", getCacheNamespace());
+        log.debug("Cache evictAll [{}].", getCacheNamespace());
         getMemcachedAdapter().evictAll(getCacheNamespace());
     }
 

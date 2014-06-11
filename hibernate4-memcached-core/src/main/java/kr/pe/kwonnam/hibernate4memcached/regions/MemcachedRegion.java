@@ -7,6 +7,8 @@ import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.Region;
 import org.hibernate.cfg.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Properties;
@@ -15,10 +17,11 @@ import java.util.Properties;
  * @author KwonNam Son (kwon37xi@gmail.com)
  */
 public class MemcachedRegion implements Region {
+    private Logger log = LoggerFactory.getLogger(MemcachedRegion.class);
+
     public static final int UNKNOWN = -1;
 
     private static final int DEFAULT_CACHE_LOCK_TIMEOUT_MILLIS = 60 * 1000;
-
 
     private CacheNamespace cacheNamespace;
 

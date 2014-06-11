@@ -82,7 +82,7 @@ public class KryoTranscoder implements Transcoder<Object> {
             int beforeSize = encodedBytes.length;
             encodedBytes = compress(encodedBytes);
 
-            log.debug("kryotranscoder compress required : {}, {} -> {}", compressionRequired, beforeSize, encodedBytes.length);
+            log.debug("kryotranscoder compress required : {}, original {} bytes -> compressed {} bytes", compressionRequired, beforeSize, encodedBytes.length);
             flags = flags | COMPRESS_FLAG;
         }
         return new CachedData(flags, encodedBytes, getMaxSize());

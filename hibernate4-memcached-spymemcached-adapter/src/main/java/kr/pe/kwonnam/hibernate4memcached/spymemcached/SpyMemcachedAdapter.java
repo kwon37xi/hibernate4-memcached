@@ -32,8 +32,8 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     public static final String TRANSCODER_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".transcoder";
 
     public static final int MAX_MEMCACHED_KEY_SIZE = 250;
-    public static final int DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS = 60 * 60 * 24 * 30; // Memcached는 MAX_EXPIRY_SECONDS는 30 days를 넘을 수 없다.
     public static final String REGION_NAME_SQUENCE_SEPARATOR = "@";
+    public static final int DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS = 60 * 60 * 24 * 30; // Memcached는 MAX_EXPIRY_SECONDS는 30 days를 넘을 수 없다.
 
     private Logger log = LoggerFactory.getLogger(SpyMemcachedAdapter.class);
 
@@ -134,7 +134,6 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
         log.debug("Spymemcached Get key [{}], hit {}.", regionPrefixedKey, value != null);
         return value;
     }
-
 
     @Override
     public void set(CacheNamespace cacheNamespace, String key, Object value, int expirySeconds) {
