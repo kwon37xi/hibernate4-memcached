@@ -156,4 +156,38 @@ public class CacheItem implements Serializable {
         }
         return false;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CacheItem cacheItem = (CacheItem) o;
+
+        if (targetClassSerialVersionUID != cacheItem.targetClassSerialVersionUID) return false;
+        if (useStructuredCache != cacheItem.useStructuredCache) return false;
+        if (!cacheEntry.equals(cacheItem.cacheEntry)) return false;
+        if (!targetClassName.equals(cacheItem.targetClassName)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = cacheEntry.hashCode();
+        result = 31 * result + targetClassName.hashCode();
+        result = 31 * result + (int) (targetClassSerialVersionUID ^ (targetClassSerialVersionUID >>> 32));
+        result = 31 * result + (useStructuredCache ? 1 : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CacheItem{" +
+                "cacheEntry=" + cacheEntry +
+                ", targetClassName='" + targetClassName + '\'' +
+                ", targetClassSerialVersionUID=" + targetClassSerialVersionUID +
+                ", useStructuredCache=" + useStructuredCache +
+                '}';
+    }
 }

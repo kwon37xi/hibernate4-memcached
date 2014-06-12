@@ -52,13 +52,35 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
             return null;
         }
 
-        return cachedData;
+        if (!(cachedData instanceof CacheItem)) {
+            log.debug("get cachedDate is not CacheItem.");
+            return cachedData;
+        }
+
+        CacheItem cacheItem = (CacheItem) cachedData;
+        boolean targetClassAndCurrentJvmTargetClassMatch = cacheItem.isTargetClassAndCurrentJvmTargetClassMatch();
+        log.debug("cacheItem and targetClassAndCurrentJvmTargetClassMatch : {} / {}", targetClassAndCurrentJvmTargetClassMatch, cacheItem);
+
+        if (cacheItem.isTargetClassAndCurrentJvmTargetClassMatch()) {
+            return cacheItem.getCacheEntry();
+        }
+
+        return null;
     }
 
     @Override
     public void put(Object key, Object value) throws CacheException {
         log.debug("Cache put [{}] : key[{}], value[{}]", getCacheNamespace(), key, value);
-        getMemcachedAdapter().set(getCacheNamespace(), String.valueOf(key), value, getExpiryInSeconds());
+
+        Object valueToCache = value;
+
+        boolean classVersionApplicable = CacheItem.checkIfClassVersionApplicable(value, getSettings().isStructuredCacheEntriesEnabled());
+        log.debug("Cache put classVersionApplicable : {}, {}", classVersionApplicable, value);
+
+        if (classVersionApplicable) {
+            valueToCache = new CacheItem(value, getSettings().isStructuredCacheEntriesEnabled());
+        }
+        getMemcachedAdapter().set(getCacheNamespace(), String.valueOf(key), valueToCache, getExpiryInSeconds());
     }
 
     @Override
