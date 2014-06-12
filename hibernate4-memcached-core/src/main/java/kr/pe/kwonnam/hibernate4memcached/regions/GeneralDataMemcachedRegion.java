@@ -85,7 +85,7 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
 
     @Override
     public void evict(Object key) throws CacheException {
-        log.debug("Cache evictAll [{}] : key[{}]", getCacheNamespace(), key);
+        log.debug("Cache evict[{}] : key[{}]", getCacheNamespace(), key);
         getMemcachedAdapter().delete(getCacheNamespace(), String.valueOf(key));
     }
 

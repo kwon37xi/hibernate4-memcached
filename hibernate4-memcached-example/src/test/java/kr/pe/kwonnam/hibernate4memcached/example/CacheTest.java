@@ -7,7 +7,6 @@ import kr.pe.kwonnam.hibernate4memcached.spymemcached.KryoTranscoder;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter;
 import net.spy.memcached.DefaultHashAlgorithm;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Environment;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -264,10 +263,12 @@ public class CacheTest {
         props.put(SpyMemcachedAdapter.HASH_ALGORITHM_PROPERTY_KEY, DefaultHashAlgorithm.KETAMA_HASH.name());
         props.put(SpyMemcachedAdapter.OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY, "5000");
         props.put(SpyMemcachedAdapter.TRANSCODER_PROPERTY_KEY, KryoTranscoder.class.getName());
+        props.put(SpyMemcachedAdapter.CACHE_KEY_PREFIX_PROPERTY_KEY, "h4m");
         props.put(KryoTranscoder.COMPRESSION_THREASHOLD_PROPERTY_KEY, "20000");
 
         emf = Persistence.createEntityManagerFactory("cachetest", props);
     }
+
     protected static void withEM(WithEM withEM) {
         System.out.println("#############################################################################");
 
