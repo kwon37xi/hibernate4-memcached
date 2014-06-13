@@ -34,7 +34,7 @@ import static kr.pe.kwonnam.hibernate4memcached.util.PropertiesUtils.getRequired
 public class Hibernate4MemcachedRegionFactory implements RegionFactory {
     private final Logger log = LoggerFactory.getLogger(Hibernate4MemcachedRegionFactory.class);
 
-    public static final String REGION_EXPIARY_SECONDS_PROPERTY_KEY_PREFIX = "h4m.expiry.seconds";
+    public static final String REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX = "h4m.expiry.seconds";
     public static final String MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY = "h4m.adapter.class";
 
     private Settings settings;

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
-import static kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory.REGION_EXPIARY_SECONDS_PROPERTY_KEY_PREFIX;
+import static kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory.REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX;
 
 /**
  * 실제 캐시를 제어하는 일반 Region
@@ -31,13 +31,13 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
     }
 
     void populateExpirySeconds(Properties properties) {
-        String regionExpirySecondsKey = REGION_EXPIARY_SECONDS_PROPERTY_KEY_PREFIX + "." + getCacheNamespace().getRegionName();
+        String regionExpirySecondsKey = REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX + "." + getCacheNamespace().getRegionName();
         String expirySecondsProperty = properties.getProperty(regionExpirySecondsKey);
         if (expirySecondsProperty == null) {
-            expirySecondsProperty = properties.getProperty(REGION_EXPIARY_SECONDS_PROPERTY_KEY_PREFIX);
+            expirySecondsProperty = properties.getProperty(REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX);
         }
         if (expirySecondsProperty == null) {
-            throw new IllegalStateException(regionExpirySecondsKey + " or " + REGION_EXPIARY_SECONDS_PROPERTY_KEY_PREFIX
+            throw new IllegalStateException(regionExpirySecondsKey + " or " + REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX
                     + "(for default expiry seconds) required!");
         }
 

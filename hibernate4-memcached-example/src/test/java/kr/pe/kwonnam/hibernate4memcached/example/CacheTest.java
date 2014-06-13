@@ -7,7 +7,7 @@ import kr.pe.kwonnam.hibernate4memcached.spymemcached.KryoTranscoder;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter;
 import net.spy.memcached.DefaultHashAlgorithm;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.cfg.Environment;
+import org.hibernate.cfg.AvailableSettings;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,13 +251,13 @@ public class CacheTest {
 
     private static void populateMemcachedEntityManagerFactory() {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(Environment.USE_SECOND_LEVEL_CACHE, true);
-        props.put(Environment.USE_QUERY_CACHE, true);
-        props.put(Environment.DEFAULT_CACHE_CONCURRENCY_STRATEGY, CacheConcurrencyStrategy.NONSTRICT_READ_WRITE);
-        props.put(Environment.CACHE_REGION_FACTORY, Hibernate4MemcachedRegionFactory.class.getName());
-        props.put(Environment.CACHE_REGION_PREFIX, "cachetest");
-        props.put(Environment.HBM2DDL_AUTO, "create-drop");
-        props.put(Environment.USE_STRUCTURED_CACHE, "false");
+        props.put(AvailableSettings.USE_SECOND_LEVEL_CACHE, true);
+        props.put(AvailableSettings.USE_QUERY_CACHE, true);
+        props.put(AvailableSettings.DEFAULT_CACHE_CONCURRENCY_STRATEGY, CacheConcurrencyStrategy.NONSTRICT_READ_WRITE);
+        props.put(AvailableSettings.CACHE_REGION_FACTORY, Hibernate4MemcachedRegionFactory.class.getName());
+        props.put(AvailableSettings.CACHE_REGION_PREFIX, "cachetest");
+        props.put(AvailableSettings.HBM2DDL_AUTO, "create-drop");
+        props.put(AvailableSettings.USE_STRUCTURED_CACHE, "false");
         props.put(Hibernate4MemcachedRegionFactory.MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY, SpyMemcachedAdapter.class.getName());
         props.put(SpyMemcachedAdapter.HOST_PROPERTY_KEY, "localhost:11211");
         props.put(SpyMemcachedAdapter.HASH_ALGORITHM_PROPERTY_KEY, DefaultHashAlgorithm.KETAMA_HASH.name());
