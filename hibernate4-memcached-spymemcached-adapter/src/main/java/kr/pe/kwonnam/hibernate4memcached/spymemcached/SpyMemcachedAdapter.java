@@ -117,8 +117,9 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
             return cacheNamespace.getRegionName();
         }
 
-        String regionNameSequenceKey = getRegionNameSequenceKey(cacheNamespace);
+        String regionNameSequenceKey = prefixWithCacheKeyprefix(getRegionNameSequenceKey(cacheNamespace));
         Long sequence = memcachedClient.incr(regionNameSequenceKey, 0L, 1L, DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS);
+        log.debug("SpyMemcached getRegionNameWithSequence {}{}", regionNameSequenceKey, sequence);
         return cacheNamespace.getRegionName() + REGION_NAME_SQUENCE_SEPARATOR + sequence;
     }
 
@@ -170,7 +171,8 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
             return;
         }
 
-        long nextSequence = memcachedClient.incr(prefixWithCacheKeyprefix(getRegionNameSequenceKey(cacheNamespace)), 1, 1L, DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS);
-        log.debug("Spymemcached region Evicted prefix : {}, cacheNamespace: {}, nextSequence {}", cacheKeyPrefix, cacheNamespace, nextSequence);
+        String rergionPrefixedKey = prefixWithCacheKeyprefix(getRegionNameSequenceKey(cacheNamespace));
+        long nextSequence = memcachedClient.incr(rergionPrefixedKey, 1, 1L, DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS);
+        log.debug("Spymemcached region Evicted prefix : {}, cacheNamespace: {}, nextSequence {}", rergionPrefixedKey, cacheNamespace, nextSequence);
     }
 }

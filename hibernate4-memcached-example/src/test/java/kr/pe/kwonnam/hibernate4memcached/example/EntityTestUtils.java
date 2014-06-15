@@ -6,7 +6,10 @@ import kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter;
 import net.spy.memcached.DefaultHashAlgorithm;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.cfg.AvailableSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -17,6 +20,7 @@ import java.util.Map;
  * @author KwonNam Son (kwon37xi@gmail.com)
  */
 public class EntityTestUtils {
+    private static Logger log = LoggerFactory.getLogger(EntityTestUtils.class);
     private static EntityManagerFactory emf;
 
     public static void init() {
@@ -45,6 +49,9 @@ public class EntityTestUtils {
             return;
         }
 
+        Cache cache = emf.getCache();
+        log.debug("###### EVICT ALL ######");
+        cache.evictAll();
         emf.close();
     }
 
