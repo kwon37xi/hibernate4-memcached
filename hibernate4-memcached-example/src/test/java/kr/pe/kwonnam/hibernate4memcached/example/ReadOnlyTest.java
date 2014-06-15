@@ -43,7 +43,7 @@ public class ReadOnlyTest {
         em = EntityTestUtils.start();
         transaction = em.getTransaction();
         transaction.begin();
-        log.debug("person 2 update.");
+        log.debug("person 2 delete.");
         Person person2 = em.find(Person.class, newPerson.getId());
         em.remove(person2);
         transaction.commit();
