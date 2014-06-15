@@ -3,6 +3,7 @@ package kr.pe.kwonnam.hibernate4memcached.regions;
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.strategies.NonstrictReadWriteEntityRegionAccessStrategy;
+import kr.pe.kwonnam.hibernate4memcached.strategies.ReadOnlyEntityRegionAccessStrategy;
 import kr.pe.kwonnam.hibernate4memcached.util.MemcachedTimestamper;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.CacheDataDescription;
@@ -24,6 +25,8 @@ public class EntityMemcachedRegion extends TransactionalDataMemcachedRegion impl
     @Override
     public EntityRegionAccessStrategy buildAccessStrategy(AccessType accessType) throws CacheException {
         switch (accessType) {
+            case READ_ONLY:
+                return new ReadOnlyEntityRegionAccessStrategy(this);
             case NONSTRICT_READ_WRITE:
                 return new NonstrictReadWriteEntityRegionAccessStrategy(this);
             default:

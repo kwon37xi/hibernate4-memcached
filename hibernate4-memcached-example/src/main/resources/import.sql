@@ -8,3 +8,5 @@ INSERT INTO authors (author_id,country,name) VALUES (null,'TOBEDELETED','난지�
 INSERT INTO book_authors(book_id, author_id) VALUES(1, 1);
 INSERT INTO book_authors(book_id, author_id) VALUES(2, 1);
 INSERT INTO book_authors(book_id, author_id) VALUES(2, 2);
+
+INSERT INTO people(person_id, name, birthdate) VALUES (null, 'KwonNam Son', '1977-04-29');

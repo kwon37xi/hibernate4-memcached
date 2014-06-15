@@ -1,37 +1,32 @@
 package kr.pe.kwonnam.hibernate4memcached.example;
 
-import kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory;
 import kr.pe.kwonnam.hibernate4memcached.example.entity.Author;
 import kr.pe.kwonnam.hibernate4memcached.example.entity.Book;
-import kr.pe.kwonnam.hibernate4memcached.spymemcached.KryoTranscoder;
-import kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter;
-import net.spy.memcached.DefaultHashAlgorithm;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.cfg.AvailableSettings;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Test hibernate4memcached
  */
 public class CacheTest {
 
-    private static EntityManagerFactory emf = null;
-
     public static final Logger log = LoggerFactory.getLogger(CacheTest.class);
 
     @Test
     public void testHibernateCache() {
-
-//        populateEntityManagerFactory();
-        populateMemcachedEntityManagerFactory();
+        EntityTestUtils.init();
 
         withEM(new WithEM() {
             @Override
@@ -246,33 +241,13 @@ public class CacheTest {
             }
         });
 
-        emf.close();
-    }
-
-    private static void populateMemcachedEntityManagerFactory() {
-        Map<String, Object> props = new HashMap<String, Object>();
-        props.put(AvailableSettings.USE_SECOND_LEVEL_CACHE, true);
-        props.put(AvailableSettings.USE_QUERY_CACHE, true);
-        props.put(AvailableSettings.DEFAULT_CACHE_CONCURRENCY_STRATEGY, CacheConcurrencyStrategy.NONSTRICT_READ_WRITE);
-        props.put(AvailableSettings.CACHE_REGION_FACTORY, Hibernate4MemcachedRegionFactory.class.getName());
-        props.put(AvailableSettings.CACHE_REGION_PREFIX, "cachetest");
-        props.put(AvailableSettings.HBM2DDL_AUTO, "create-drop");
-        props.put(AvailableSettings.USE_STRUCTURED_CACHE, "false");
-        props.put(Hibernate4MemcachedRegionFactory.MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY, SpyMemcachedAdapter.class.getName());
-        props.put(SpyMemcachedAdapter.HOST_PROPERTY_KEY, "localhost:11211");
-        props.put(SpyMemcachedAdapter.HASH_ALGORITHM_PROPERTY_KEY, DefaultHashAlgorithm.KETAMA_HASH.name());
-        props.put(SpyMemcachedAdapter.OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY, "5000");
-        props.put(SpyMemcachedAdapter.TRANSCODER_PROPERTY_KEY, KryoTranscoder.class.getName());
-        props.put(SpyMemcachedAdapter.CACHE_KEY_PREFIX_PROPERTY_KEY, "h4m");
-        props.put(KryoTranscoder.COMPRESSION_THREASHOLD_PROPERTY_KEY, "20000");
-
-        emf = Persistence.createEntityManagerFactory("cachetest", props);
+        EntityTestUtils.destroy();
     }
 
     protected static void withEM(WithEM withEM) {
         System.out.println("#############################################################################");
 
-        EntityManager em = emf.createEntityManager();
+        EntityManager em = EntityTestUtils.start();
 
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
@@ -285,7 +260,7 @@ public class CacheTest {
             transaction.rollback();
             throw new RuntimeException(e);
         } finally {
-            em.close();
+            EntityTestUtils.stop(em);
         }
     }
 

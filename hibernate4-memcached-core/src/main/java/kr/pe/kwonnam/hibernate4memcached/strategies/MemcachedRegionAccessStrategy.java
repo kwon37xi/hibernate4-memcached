@@ -4,11 +4,14 @@ import kr.pe.kwonnam.hibernate4memcached.regions.GeneralDataMemcachedRegion;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.access.RegionAccessStrategy;
 import org.hibernate.cache.spi.access.SoftLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author KwonNam Son (kwon37xi@gmail.com)
  */
 public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
+    private Logger log = LoggerFactory.getLogger(MemcachedRegionAccessStrategy.class);
 
     private GeneralDataMemcachedRegion internalRegion;
 
@@ -22,6 +25,7 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
 
     @Override
     public Object get(Object key, long txTimestamp) throws CacheException {
+        log.debug("region access strategy get() {} {}", getInternalRegion().getCacheNamespace(), key);
         return getInternalRegion().get(key);
     }
 
@@ -32,6 +36,7 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
 
     @Override
     public boolean putFromLoad(Object key, Object value, long txTimestamp, Object version, boolean minimalPutOverride) throws CacheException {
+        log.debug("region access strategy putFromLoad() {} {}", getInternalRegion().getCacheNamespace(), key);
         if (key == null || value == null) {
             return false;
         }
@@ -44,6 +49,7 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
 
     @Override
     public SoftLock lockItem(Object key, Object version) throws CacheException {
+        log.debug("region access strategy lockItem() {} {}", getInternalRegion().getCacheNamespace(), key);
         return null;
     }
 
@@ -52,35 +58,42 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
      */
     @Override
     public SoftLock lockRegion() throws CacheException {
+        log.debug("region access strategy lockRegion() {}", getInternalRegion().getCacheNamespace());
         return null;
     }
 
     /**
      * 캐시 삭제를 수행한다.
+     *
      * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
      */
     @Override
     public void unlockItem(Object key, SoftLock lock) throws CacheException {
+        log.debug("region access strategy unlockItem() {} {}", getInternalRegion().getCacheNamespace(), key);
         evict(key);
     }
 
     /**
      * HQL/SQL 실행시 region 을 evict할 때 실행해야 한다.
+     *
      * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
      * @see org.hibernate.cache.spi.access.RegionAccessStrategy#unlockRegion(org.hibernate.cache.spi.access.SoftLock)
      */
     @Override
     public void unlockRegion(SoftLock lock) throws CacheException {
+        log.debug("region access strategy unlockRegion lock() {} {}", getInternalRegion().getCacheNamespace(), lock);
         evictAll();
     }
 
     /**
      * 트랜잭션 완료전의 remove 작업 수행.
      * memcached와는 무관한 것임.
+     *
      * @see org.hibernate.cache.spi.access.RegionAccessStrategy#remove(java.lang.Object)
      */
     @Override
     public void remove(Object key) throws CacheException {
+        log.debug("region access strategy remove() {} {}", getInternalRegion().getCacheNamespace(), key);
     }
 
     /**
@@ -91,6 +104,7 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
      */
     @Override
     public void removeAll() throws CacheException {
+        log.debug("region access strategy removeAll() {}", getInternalRegion().getCacheNamespace());
         // do nothing
     }
 
@@ -99,11 +113,13 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
      */
     @Override
     public void evict(Object key) throws CacheException {
+        log.debug("region access strategy evict() {} {}", getInternalRegion().getCacheNamespace(), key);
         getInternalRegion().evict(key);
     }
 
     @Override
     public void evictAll() throws CacheException {
+        log.debug("region access strategy evictAll() {}", getInternalRegion().getCacheNamespace());
         getInternalRegion().evictAll();
     }
 

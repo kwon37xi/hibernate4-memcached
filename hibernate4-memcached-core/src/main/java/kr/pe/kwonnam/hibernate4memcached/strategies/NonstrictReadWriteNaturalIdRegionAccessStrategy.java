@@ -3,11 +3,15 @@ package kr.pe.kwonnam.hibernate4memcached.strategies;
 import kr.pe.kwonnam.hibernate4memcached.regions.NaturalIdMemcachedRegion;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.access.SoftLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNaturalIdMemcachedRegionAccessStrategy {
+    private Logger log = LoggerFactory.getLogger(NonstrictReadWriteNaturalIdRegionAccessStrategy.class);
+
     public NonstrictReadWriteNaturalIdRegionAccessStrategy(NaturalIdMemcachedRegion naturalIdMemcachedRegion) {
         super(naturalIdMemcachedRegion);
     }
@@ -19,6 +23,7 @@ public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNatural
      */
     @Override
     public boolean insert(Object key, Object value) throws CacheException {
+        log.debug("region access strategy nonstrict-read-write naturalId insert() {} {}", getInternalRegion().getCacheNamespace(), key);
         return false;
     }
 
@@ -32,6 +37,7 @@ public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNatural
      */
     @Override
     public boolean afterInsert(Object key, Object value) throws CacheException {
+        log.debug("region access strategy nonstrict-read-write naturalId afterInsert() {} {}" , getInternalRegion().getCacheNamespace(), key);
         return false;
     }
 
@@ -42,6 +48,7 @@ public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNatural
      */
     @Override
     public boolean update(Object key, Object value) throws CacheException {
+        log.debug("region access strategy nonstrict-read-write naturalId update() {} {}", getInternalRegion().getCacheNamespace(), key);
         return false;
     }
 
@@ -52,6 +59,7 @@ public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNatural
      */
     @Override
     public boolean afterUpdate(Object key, Object value, SoftLock lock) throws CacheException {
+        log.debug("region access strategy nonstrict-read-write naturalId afterUpdate() {} {}", getInternalRegion().getCacheNamespace(), key);
         getInternalRegion().evict(key);
         return false;
     }

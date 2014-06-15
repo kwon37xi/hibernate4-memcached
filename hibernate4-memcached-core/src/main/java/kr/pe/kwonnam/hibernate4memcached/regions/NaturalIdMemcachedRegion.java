@@ -3,6 +3,7 @@ package kr.pe.kwonnam.hibernate4memcached.regions;
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.strategies.NonstrictReadWriteNaturalIdRegionAccessStrategy;
+import kr.pe.kwonnam.hibernate4memcached.strategies.ReadOnlyNaturalIdRegionAccessStrategy;
 import kr.pe.kwonnam.hibernate4memcached.util.MemcachedTimestamper;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.CacheDataDescription;
@@ -24,6 +25,8 @@ public class NaturalIdMemcachedRegion extends TransactionalDataMemcachedRegion i
     @Override
     public NaturalIdRegionAccessStrategy buildAccessStrategy(AccessType accessType) throws CacheException {
         switch (accessType) {
+            case READ_ONLY:
+                return new ReadOnlyNaturalIdRegionAccessStrategy(this);
             case NONSTRICT_READ_WRITE:
                 return new NonstrictReadWriteNaturalIdRegionAccessStrategy(this);
             default:
