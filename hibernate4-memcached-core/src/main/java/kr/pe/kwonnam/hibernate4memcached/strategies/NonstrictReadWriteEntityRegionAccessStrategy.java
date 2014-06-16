@@ -16,27 +16,17 @@ public class NonstrictReadWriteEntityRegionAccessStrategy extends BaseEntityMemc
         super(entityMemcachedRegion);
     }
 
-    /**
-     * nostrict-read-write에서는 불필요한 작업
-     *
-     * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
-     */
     @Override
     public boolean insert(Object key, Object value, Object version) throws CacheException {
         log.debug("region access strategy nonstrict-read-write entity insert() {} {}", getInternalRegion().getCacheNamespace(), key);
+        // On nonstrict-read-write, Hibernate never calls this method.
         return false;
     }
 
-    /**
-     * nostrict-read-write에서는 불필요한 작업.
-     *
-     * insert 직후 자동으로 evict가 일어나며, 여기서는 evict후 다시 캐시에 넣는 역할을 하는데, 그렇게 처리하지 않고, 다시
-     * 데이터를 읽는 작업이 발생할  때 캐시하도록 그냥 넘긴다..
-     * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
-     */
     @Override
     public boolean afterInsert(Object key, Object value, Object version) throws CacheException {
-        log.debug("region access strategy nonstrict-read-write entity afterInsert() {} {}" , getInternalRegion().getCacheNamespace(), key);
+        log.debug("region access strategy nonstrict-read-write entity afterInsert() {} {}", getInternalRegion().getCacheNamespace(), key);
+        // On nonstrict-read-write, Hibernate never calls this method.
         return false;
     }
 
@@ -53,6 +43,7 @@ public class NonstrictReadWriteEntityRegionAccessStrategy extends BaseEntityMemc
 
     /**
      * update 후, 기존 캐시를 삭제해줘야 한다.
+     *
      * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
      */
     @Override

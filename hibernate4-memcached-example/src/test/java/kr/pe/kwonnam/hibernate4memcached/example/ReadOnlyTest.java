@@ -28,6 +28,7 @@ public class ReadOnlyTest {
         EntityTransaction transaction = em.getTransaction();
         transaction.begin();
 
+        log.debug("### First load and save");
         log.debug("person 1 first load.");
         Person person = em.find(Person.class, 1L);
         log.debug("person first load : {}", person);
@@ -40,6 +41,7 @@ public class ReadOnlyTest {
         transaction.commit();
         EntityTestUtils.stop(em);
 
+        log.debug("### Delete!");
         em = EntityTestUtils.start();
         transaction = em.getTransaction();
         transaction.begin();
@@ -48,6 +50,22 @@ public class ReadOnlyTest {
         em.remove(person2);
         transaction.commit();
         EntityTestUtils.stop(em);
+
+        try {
+            // update시에는 exception 발생.
+            log.debug("### Update!");
+            em = EntityTestUtils.start();
+            transaction = em.getTransaction();
+            transaction.begin();
+            person = em.find(Person.class, 1L);
+            person.setBirthdate(new Date());
+            em.merge(person);
+            transaction.commit();
+        } catch (Exception ex) {
+            log.error("Update 중 오류 발생", ex);
+        } finally {
+            EntityTestUtils.stop(em);
+        }
     }
 
     @After
