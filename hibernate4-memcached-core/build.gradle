@@ -1,14 +1,6 @@
-ext {
-    hibernateVersion = '4.2.12.Final'
-    lz4Version = '1.2.0'
-}
-
 dependencies {
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
     // lz4 for serialized data compression
     compile "net.jpountz.lz4:lz4:${lz4Version}"
     compile 'org.apache.commons:commons-lang3:3.3.2'
-
-    testCompile "org.hibernate:hibernate-testing:${hibernateVersion}"
-    testCompile "org.hibernate:hibernate-ehcache:${hibernateVersion}"
 }

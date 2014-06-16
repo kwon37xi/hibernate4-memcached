@@ -6,6 +6,8 @@ buildscript {
 
 ext {
     javaVersion = '1.6'
+    hibernateVersion = '4.2.12.Final'
+    lz4Version = '1.2.0'
 }
 
 subprojects {

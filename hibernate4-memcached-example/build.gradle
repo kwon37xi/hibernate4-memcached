@@ -1,5 +1,7 @@
 dependencies {
     compile project(':hibernate4-memcached-spymemcached-adapter')
-    compile 'org.hibernate:hibernate-entitymanager:4.2.12.Final'
+    compile "org.hibernate:hibernate-entitymanager:${hibernateVersion}"
     compile 'mysql:mysql-connector-java:5.1.30'
+
+    testCompile "org.hibernate:hibernate-ehcache:${hibernateVersion}"
 }
