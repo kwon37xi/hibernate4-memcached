@@ -5,8 +5,6 @@ import org.hibernate.cfg.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
-
 /**
  * Generates increasing identifier for {@link org.hibernate.cache.spi.RegionFactory#nextTimestamp()}.
  *
@@ -17,7 +15,7 @@ public class MemcachedTimestamper {
 
     private Settings settings;
 
-    private Properties properties;
+    private OverridableReadOnlyProperties properties;
 
     private MemcachedAdapter memcachedAdapter;
 
@@ -25,7 +23,7 @@ public class MemcachedTimestamper {
         // do nothing;
     }
 
-    public MemcachedTimestamper(Settings settings, Properties properties, MemcachedAdapter memcachedAdapter) {
+    public MemcachedTimestamper(Settings settings, OverridableReadOnlyProperties properties, MemcachedAdapter memcachedAdapter) {
         this.settings = settings;
         this.properties = properties;
         this.memcachedAdapter = memcachedAdapter;

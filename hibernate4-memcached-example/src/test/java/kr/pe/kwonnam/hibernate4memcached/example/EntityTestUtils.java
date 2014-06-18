@@ -30,6 +30,7 @@ public class EntityTestUtils {
         props.put(AvailableSettings.DEFAULT_CACHE_CONCURRENCY_STRATEGY, CacheConcurrencyStrategy.NONSTRICT_READ_WRITE);
         props.put(AvailableSettings.CACHE_REGION_FACTORY, Hibernate4MemcachedRegionFactory.class.getName());
         props.put(AvailableSettings.CACHE_REGION_PREFIX, "cachetest");
+        props.put(AvailableSettings.CACHE_PROVIDER_CONFIG, "META-INF/h4m-properties.xml");
         props.put(AvailableSettings.HBM2DDL_AUTO, "create");
         props.put(AvailableSettings.USE_STRUCTURED_CACHE, "false");
         props.put(Hibernate4MemcachedRegionFactory.MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY, SpyMemcachedAdapter.class.getName());

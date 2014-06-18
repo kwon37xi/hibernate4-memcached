@@ -2,6 +2,7 @@ package kr.pe.kwonnam.hibernate4memcached.spymemcached;
 
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
+import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import net.spy.memcached.*;
 import net.spy.memcached.transcoders.Transcoder;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -10,9 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.Properties;
-
-import static kr.pe.kwonnam.hibernate4memcached.util.PropertiesUtils.getRequiredProeprties;
 
 /**
  * SpymemcachedAdapter for hibernate4memcached.
@@ -43,11 +41,11 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     private String cacheKeyPrefix = "";
 
     @Override
-    public void init(Properties properties) {
+    public void init(OverridableReadOnlyProperties properties) {
         ConnectionFactoryBuilder builder = getConnectionFactoryBuilder(properties);
 
         try {
-            String addresses = getRequiredProeprties(properties, HOST_PROPERTY_KEY);
+            String addresses = properties.getRequiredProperty(HOST_PROPERTY_KEY);
             memcachedClient = new MemcachedClient(builder.build(), AddrUtil.getAddresses(addresses));
         } catch (IOException e) {
             throw new IllegalStateException(e.getMessage(), e);
@@ -61,7 +59,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
      * ConnectionFactoryBuilder 생성. 더 상세 설정이 필요할 경우, 상속하여
      * 이 부분을 Override 한다.
      */
-    protected ConnectionFactoryBuilder getConnectionFactoryBuilder(Properties properties) {
+    protected ConnectionFactoryBuilder getConnectionFactoryBuilder(OverridableReadOnlyProperties properties) {
         ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
         // BINARY Only!!! spymemcached incr/decr correctly supports only BINARY mode.
         builder.setProtocol(ConnectionFactoryBuilder.Protocol.BINARY);
@@ -70,17 +68,17 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
         builder.setUseNagleAlgorithm(false);
         builder.setFailureMode(FailureMode.Redistribute);
 
-        String hashAlgorithmProeprty = getRequiredProeprties(properties, HASH_ALGORITHM_PROPERTY_KEY);
+        String hashAlgorithmProeprty = properties.getRequiredProperty(HASH_ALGORITHM_PROPERTY_KEY);
         builder.setHashAlg(DefaultHashAlgorithm.valueOf(hashAlgorithmProeprty));
 
-        String operationTimeoutProperty = getRequiredProeprties(properties, OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY);
+        String operationTimeoutProperty = properties.getRequiredProperty(OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY);
         builder.setOpTimeout(Long.parseLong(operationTimeoutProperty));
 
-        String transcoderClassProperty = getRequiredProeprties(properties, TRANSCODER_PROPERTY_KEY);
+        String transcoderClassProperty = properties.getRequiredProperty(TRANSCODER_PROPERTY_KEY);
         try {
             @SuppressWarnings("unchecked")
             Class<Transcoder<Object>> transcoderClass = (Class<Transcoder<Object>>) Class.forName(transcoderClassProperty);
-            Constructor<Transcoder<Object>> constructor = transcoderClass.getConstructor(Properties.class);
+            Constructor<Transcoder<Object>> constructor = transcoderClass.getConstructor(OverridableReadOnlyProperties.class);
 
             builder.setTranscoder(constructor.newInstance(properties));
         } catch (Exception e) {

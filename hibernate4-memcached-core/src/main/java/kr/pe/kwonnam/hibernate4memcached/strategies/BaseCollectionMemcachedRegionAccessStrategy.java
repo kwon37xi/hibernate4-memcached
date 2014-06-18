@@ -7,8 +7,8 @@ import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
 /**
  * {@link CollectionRegionAccessStrategy}는 insert, update에는 반응하지 않으면 delete와 load에만 반응한다.
  *
- * @see org.hibernate.cache.spi.access.CollectionRegionAccessStrategy
  * @author KwonNam Son (kwon37xi@gmail.com)
+ * @see org.hibernate.cache.spi.access.CollectionRegionAccessStrategy
  */
 public abstract class BaseCollectionMemcachedRegionAccessStrategy extends MemcachedRegionAccessStrategy implements CollectionRegionAccessStrategy {
     private CollectionMemcachedRegion collectionMemcachedRegion;

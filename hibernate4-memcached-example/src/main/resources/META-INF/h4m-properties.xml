@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="h4m.expiry.seconds">600</entry><!-- 10 minutes -->
+    <entry key="h4m.expiry.seconds.cachetest.org.hibernate.cache.spi.UpdateTimestampsCache">2592000</entry>
+    <entry key="h4m.expiry.seconds.cachetest.org.hibernate.cache.internal.StandardQueryCache">3600</entry>
+    <entry key="h4m.expiry.seconds.cachetest.books">3600</entry>
+    <entry key="h4m.expiry.seconds.cachetest.authors">1800</entry>
+</properties>

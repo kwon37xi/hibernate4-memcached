@@ -9,9 +9,8 @@ import org.slf4j.LoggerFactory;
 /**
  * ReadOnly concurrency strategy.
  *
- * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
- *
  * @author KwonNam Son (kwon37xi@gmail.com)
+ * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
  */
 public class ReadOnlyEntityRegionAccessStrategy extends BaseEntityMemcachedRegionAccessStrategy {
     private Logger log = LoggerFactory.getLogger(ReadOnlyEntityRegionAccessStrategy.class);
@@ -29,7 +28,7 @@ public class ReadOnlyEntityRegionAccessStrategy extends BaseEntityMemcachedRegio
 
     @Override
     public boolean afterInsert(Object key, Object value, Object version) throws CacheException {
-        log.debug("region access strategy readonly entity afterInsert() {} {}" , getInternalRegion().getCacheNamespace(), key);
+        log.debug("region access strategy readonly entity afterInsert() {} {}", getInternalRegion().getCacheNamespace(), key);
         // On read-only, Hibernate never calls this method.
         return false;
     }

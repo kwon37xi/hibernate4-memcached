@@ -25,7 +25,7 @@ public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNatural
 
     @Override
     public boolean afterInsert(Object key, Object value) throws CacheException {
-        log.debug("region access strategy nonstrict-read-write naturalId afterInsert() {} {}" , getInternalRegion().getCacheNamespace(), key);
+        log.debug("region access strategy nonstrict-read-write naturalId afterInsert() {} {}", getInternalRegion().getCacheNamespace(), key);
         // On nonstrict-read-write, Hibernate never calls this method.
         return false;
     }

@@ -7,7 +7,7 @@ import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 import de.javakaffee.kryoserializers.KryoReflectionFactorySupport;
 import kr.pe.kwonnam.hibernate4memcached.util.IntToBytesUtils;
 import kr.pe.kwonnam.hibernate4memcached.util.Lz4CompressUtils;
-import kr.pe.kwonnam.hibernate4memcached.util.PropertiesUtils;
+import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import net.spy.memcached.CachedData;
 import net.spy.memcached.transcoders.Transcoder;
 import org.apache.commons.lang3.ArrayUtils;
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Properties;
 
 /**
  * * LZ4 압축 필요 용량 : h4m.adapter.spymemcached.kryotranscoder.compression.threashold.bytes=20000
@@ -34,7 +33,7 @@ public class KryoTranscoder implements Transcoder<Object> {
 
     public static final int DECOMPRESSED_SIZE_STORE_BYTES_LENGTH = 4;
 
-    private Properties properties;
+    private OverridableReadOnlyProperties properties;
 
     private int bufferSize = DEFAULT_BUFFER_SIZE;
 
@@ -43,14 +42,14 @@ public class KryoTranscoder implements Transcoder<Object> {
     /**
      * Transcoder must have a constructor with a Properties argument.
      */
-    public KryoTranscoder(Properties properties) {
+    public KryoTranscoder(OverridableReadOnlyProperties properties) {
         this.properties = properties;
 
         populateCompressionThreasholdBytes(properties);
     }
 
-    private void populateCompressionThreasholdBytes(Properties properties) {
-        String compressionThreasholdBytesProperty = PropertiesUtils.getRequiredProeprties(properties, COMPRESSION_THREASHOLD_PROPERTY_KEY);
+    private void populateCompressionThreasholdBytes(OverridableReadOnlyProperties properties) {
+        String compressionThreasholdBytesProperty = properties.getRequiredProperty(COMPRESSION_THREASHOLD_PROPERTY_KEY);
         compressionThreasholdBytes = Integer.parseInt(compressionThreasholdBytesProperty);
     }
 

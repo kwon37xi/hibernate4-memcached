@@ -1,7 +1,6 @@
 package kr.pe.kwonnam.hibernate4memcached.strategies;
 
 import kr.pe.kwonnam.hibernate4memcached.regions.CollectionMemcachedRegion;
-import org.hibernate.cache.spi.access.CollectionRegionAccessStrategy;
 
 /**
  * @author KwonNam Son (kwon37xi@gmail.com)

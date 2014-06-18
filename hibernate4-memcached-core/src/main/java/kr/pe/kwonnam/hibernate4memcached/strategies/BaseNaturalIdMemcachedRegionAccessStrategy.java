@@ -5,8 +5,8 @@ import org.hibernate.cache.spi.NaturalIdRegion;
 import org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy;
 
 /**
- * @see org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy
  * @author KwonNam Son (kwon37xi@gmail.com)
+ * @see org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy
  */
 public abstract class BaseNaturalIdMemcachedRegionAccessStrategy extends MemcachedRegionAccessStrategy implements NaturalIdRegionAccessStrategy {
     private NaturalIdMemcachedRegion naturalIdMemcachedRegion;

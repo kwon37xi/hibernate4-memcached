@@ -3,14 +3,13 @@ package kr.pe.kwonnam.hibernate4memcached.regions;
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.util.MemcachedTimestamper;
+import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.CacheDataDescription;
 import org.hibernate.cache.spi.GeneralDataRegion;
 import org.hibernate.cfg.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
 
 import static kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory.REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX;
 
@@ -24,13 +23,13 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
 
     private int expirySeconds;
 
-    public GeneralDataMemcachedRegion(CacheNamespace cacheNamespace, Properties properties, CacheDataDescription metadata,
+    public GeneralDataMemcachedRegion(CacheNamespace cacheNamespace, OverridableReadOnlyProperties properties, CacheDataDescription metadata,
                                       Settings settings, MemcachedAdapter memcachedAdapter, MemcachedTimestamper memcachedTimestamper) {
         super(cacheNamespace, properties, metadata, settings, memcachedAdapter, memcachedTimestamper);
         populateExpirySeconds(properties);
     }
 
-    void populateExpirySeconds(Properties properties) {
+    void populateExpirySeconds(OverridableReadOnlyProperties properties) {
         String regionExpirySecondsKey = REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX + "." + getCacheNamespace().getRegionName();
         String expirySecondsProperty = properties.getProperty(regionExpirySecondsKey);
         if (expirySecondsProperty == null) {

@@ -2,8 +2,7 @@ package kr.pe.kwonnam.hibernate4memcached;
 
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
-
-import java.util.Properties;
+import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 
 /**
 * @author KwonNam Son (kwon37xi@gmail.com)
@@ -11,7 +10,7 @@ import java.util.Properties;
 public class FakeMemcachedAdapter implements MemcachedAdapter {
 
     @Override
-    public void init(Properties properties) {
+    public void init(OverridableReadOnlyProperties properties) {
     }
 
     @Override

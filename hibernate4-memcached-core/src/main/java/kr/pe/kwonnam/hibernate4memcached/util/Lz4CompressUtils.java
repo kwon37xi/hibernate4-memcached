@@ -7,13 +7,13 @@ import net.jpountz.lz4.LZ4SafeDecompressor;
 
 /**
  * Lz4 Compression Utils. L4z is much faster than gzip
- *
+ * <p/>
  * <a href="https://github.com/jpountz/lz4-java">lz4-java</a>
  *
  * @author KwonNam Son (kwon37xi@gmail.com)
  */
 public class Lz4CompressUtils {
-    private static final LZ4Factory factory =  LZ4Factory.fastestInstance();
+    private static final LZ4Factory factory = LZ4Factory.fastestInstance();
 
     public static byte[] compress(final byte[] data) {
         if (data == null) {

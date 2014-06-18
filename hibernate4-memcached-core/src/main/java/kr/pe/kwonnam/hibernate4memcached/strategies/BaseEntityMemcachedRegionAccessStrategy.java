@@ -5,8 +5,8 @@ import org.hibernate.cache.spi.EntityRegion;
 import org.hibernate.cache.spi.access.EntityRegionAccessStrategy;
 
 /**
- * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
  * @author KwonNam Son (kwon37xi@gmail.com)
+ * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
  */
 public abstract class BaseEntityMemcachedRegionAccessStrategy extends MemcachedRegionAccessStrategy implements EntityRegionAccessStrategy {
     private EntityMemcachedRegion entityMemcachedRegion;

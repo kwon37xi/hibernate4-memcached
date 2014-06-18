@@ -8,6 +8,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -18,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CacheItemTest {
+    private Logger log = LoggerFactory.getLogger(CacheItemTest.class);
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -95,7 +98,7 @@ public class CacheItemTest {
         CacheItem cacheItem = new CacheItem(cacheEntry, false);
 
         assertThat(cacheItem.getTargetClassName()).isEqualTo(FakeEntityWithoutSerialVersionUID.class.getName());
-        System.out.println(cacheItem.getTargetClassSerialVersionUID());
+        log.debug("targetClassSerialVersionUID : {}", cacheItem.getTargetClassSerialVersionUID());
     }
 
     @Test
