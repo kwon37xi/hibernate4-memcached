@@ -15,7 +15,7 @@ subprojects {
     apply plugin: 'jacoco'
 
     group = 'kr.pe.kwonnam.hibernate4memcached'
-    version = '0.4-SNAPSHOT'
+    version = '0.4.RELEASE'
 
     repositories {
         mavenCentral()
