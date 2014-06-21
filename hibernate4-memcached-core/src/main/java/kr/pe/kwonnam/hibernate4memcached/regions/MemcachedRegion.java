@@ -2,7 +2,7 @@ package kr.pe.kwonnam.hibernate4memcached.regions;
 
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
-import kr.pe.kwonnam.hibernate4memcached.util.MemcachedTimestamper;
+import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamper;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.CacheDataDescription;
@@ -33,16 +33,16 @@ public class MemcachedRegion implements Region {
 
     private MemcachedAdapter memcachedAdapter;
 
-    private MemcachedTimestamper memcachedTimestamper;
+    private HibernateCacheTimestamper hibernateCacheTimestamper;
 
     public MemcachedRegion(CacheNamespace cacheNamespace, OverridableReadOnlyProperties properties, CacheDataDescription metadata, Settings settings,
-                           MemcachedAdapter memcachedAdapter, MemcachedTimestamper memcachedTimestamper) {
+                           MemcachedAdapter memcachedAdapter, HibernateCacheTimestamper hibernateCacheTimestamper) {
         this.cacheNamespace = cacheNamespace;
         this.properties = properties;
         this.metadata = metadata;
         this.settings = settings;
         this.memcachedAdapter = memcachedAdapter;
-        this.memcachedTimestamper = memcachedTimestamper;
+        this.hibernateCacheTimestamper = hibernateCacheTimestamper;
     }
 
     public CacheNamespace getCacheNamespace() {
@@ -65,13 +65,13 @@ public class MemcachedRegion implements Region {
         return memcachedAdapter;
     }
 
-    public MemcachedTimestamper getMemcachedTimestamper() {
-        return memcachedTimestamper;
+    public HibernateCacheTimestamper getHibernateCacheTimestamper() {
+        return hibernateCacheTimestamper;
     }
 
     @Override
     public String getName() {
-        return cacheNamespace.getRegionName();
+        return cacheNamespace.getName();
     }
 
     /**
@@ -118,7 +118,7 @@ public class MemcachedRegion implements Region {
 
     @Override
     public long nextTimestamp() {
-        return memcachedTimestamper.next();
+        return hibernateCacheTimestamper.next();
     }
 
     @Override

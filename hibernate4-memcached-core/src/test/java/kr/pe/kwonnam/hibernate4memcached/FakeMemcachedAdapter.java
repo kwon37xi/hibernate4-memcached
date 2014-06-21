@@ -32,6 +32,16 @@ public class FakeMemcachedAdapter implements MemcachedAdapter {
     }
 
     @Override
+    public long increaseCounter(CacheNamespace cacheNamespace, String key, long by, long defaultValue, int expirySeconds) {
+        return 0;
+    }
+
+    @Override
+    public long getCounter(CacheNamespace cacheNamespace, String key, long defaultValue, int expirySeconds) {
+        return 0;
+    }
+
+    @Override
     public void evictAll(CacheNamespace cacheNamespace) {
     }
 }

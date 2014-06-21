@@ -1,5 +1,6 @@
 package kr.pe.kwonnam.hibernate4memcached.spymemcached;
 
+import kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory;
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
@@ -27,8 +28,8 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
 
     public static final int MAX_MEMCACHED_KEY_SIZE = 250;
     public static final String REGION_NAME_SQUENCE_SEPARATOR = "@";
-    // memcached expiry time can not be greater than 30 days
-    public static final int DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS = 60 * 60 * 24 * 30;
+
+    public static final int DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS = Hibernate4MemcachedRegionFactory.MEMCACHED_MAX_EPIRY_SECONDS;
 
     private Logger log = LoggerFactory.getLogger(SpyMemcachedAdapter.class);
 
@@ -115,18 +116,18 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     }
 
     String getRegionNameWithSequence(CacheNamespace cacheNamespace) {
-        if (!cacheNamespace.isRegionExpirationRequired()) {
-            return cacheNamespace.getRegionName();
+        if (!cacheNamespace.isNamespaceExpirationRequired()) {
+            return cacheNamespace.getName();
         }
 
         String regionNameSequenceKey = prefixWithCacheKeyPrefix(getRegionNameSequenceKey(cacheNamespace));
         Long sequence = memcachedClient.incr(regionNameSequenceKey, 0L, System.currentTimeMillis(), DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS);
         log.debug("SpyMemcached getRegionNameWithSequence {}{}", regionNameSequenceKey, sequence);
-        return cacheNamespace.getRegionName() + REGION_NAME_SQUENCE_SEPARATOR + sequence;
+        return cacheNamespace.getName() + REGION_NAME_SQUENCE_SEPARATOR + sequence;
     }
 
     String getRegionNameSequenceKey(CacheNamespace cacheNamespace) {
-        return cacheNamespace.getRegionName() + REGION_NAME_SQUENCE_SEPARATOR;
+        return cacheNamespace.getName() + REGION_NAME_SQUENCE_SEPARATOR;
     }
 
     protected String hashKey(String key) {
@@ -187,7 +188,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
 
     @Override
     public void evictAll(CacheNamespace cacheNamespace) {
-        if (!cacheNamespace.isRegionExpirationRequired()) {
+        if (!cacheNamespace.isNamespaceExpirationRequired()) {
             log.debug("Spymemcached region Evict {} requested but did nothing because regionExpirationRequired == false.", cacheNamespace);
             return;
         }

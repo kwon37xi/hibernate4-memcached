@@ -2,7 +2,7 @@ package kr.pe.kwonnam.hibernate4memcached.regions;
 
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
-import kr.pe.kwonnam.hibernate4memcached.util.MemcachedTimestamper;
+import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamper;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import org.hibernate.cache.CacheException;
 import org.hibernate.cache.spi.CacheDataDescription;
@@ -11,7 +11,8 @@ import org.hibernate.cfg.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory.REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX;
+import static kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory
+        .REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX;
 
 /**
  * 실제 캐시를 제어하는 일반 Region
@@ -24,13 +25,13 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
     private int expirySeconds;
 
     public GeneralDataMemcachedRegion(CacheNamespace cacheNamespace, OverridableReadOnlyProperties properties, CacheDataDescription metadata,
-                                      Settings settings, MemcachedAdapter memcachedAdapter, MemcachedTimestamper memcachedTimestamper) {
-        super(cacheNamespace, properties, metadata, settings, memcachedAdapter, memcachedTimestamper);
+                                      Settings settings, MemcachedAdapter memcachedAdapter, HibernateCacheTimestamper hibernateCacheTimestamper) {
+        super(cacheNamespace, properties, metadata, settings, memcachedAdapter, hibernateCacheTimestamper);
         populateExpirySeconds(properties);
     }
 
     void populateExpirySeconds(OverridableReadOnlyProperties properties) {
-        String regionExpirySecondsKey = REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX + "." + getCacheNamespace().getRegionName();
+        String regionExpirySecondsKey = REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX + "." + getCacheNamespace().getName();
         String expirySecondsProperty = properties.getProperty(regionExpirySecondsKey);
         if (expirySecondsProperty == null) {
             expirySecondsProperty = properties.getProperty(REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX);

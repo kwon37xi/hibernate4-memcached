@@ -11,7 +11,7 @@ public class CacheNamespace implements Serializable {
     /**
      * name of region
      */
-    private String regionName;
+    private String name;
 
     /**
      * if this value is true, the memcached adapter should implement namespace pattern
@@ -19,19 +19,19 @@ public class CacheNamespace implements Serializable {
      * <p/>
      * see <a href="https://code.google.com/p/memcached/wiki/NewProgrammingTricks#Namespacing">Memcached Namespacing</a>
      */
-    private boolean regionExpirationRequired;
+    private boolean namespaceExpirationRequired;
 
-    public CacheNamespace(String regionName, boolean regionExpirationRequired) {
-        this.regionName = regionName;
-        this.regionExpirationRequired = regionExpirationRequired;
+    public CacheNamespace(String name, boolean namespaceExpirationRequired) {
+        this.name = name;
+        this.namespaceExpirationRequired = namespaceExpirationRequired;
     }
 
-    public String getRegionName() {
-        return regionName;
+    public String getName() {
+        return name;
     }
 
-    public boolean isRegionExpirationRequired() {
-        return regionExpirationRequired;
+    public boolean isNamespaceExpirationRequired() {
+        return namespaceExpirationRequired;
     }
 
     @Override
@@ -41,21 +41,24 @@ public class CacheNamespace implements Serializable {
 
         CacheNamespace that = (CacheNamespace) o;
 
-        if (!regionName.equals(that.regionName)) return false;
+        if (namespaceExpirationRequired != that.namespaceExpirationRequired) return false;
+        if (!name.equals(that.name)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return regionName.hashCode();
+        int result = name.hashCode();
+        result = 31 * result + (namespaceExpirationRequired ? 1 : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "CacheNamespace{" +
-                "regionName='" + regionName + '\'' +
-                ", regionExpirationRequired=" + regionExpirationRequired +
+                "name='" + name + '\'' +
+                ", namespaceExpirationRequired=" + namespaceExpirationRequired +
                 '}';
     }
 }
