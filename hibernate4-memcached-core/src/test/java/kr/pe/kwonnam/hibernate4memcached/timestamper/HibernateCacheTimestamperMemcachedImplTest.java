@@ -2,7 +2,6 @@ package kr.pe.kwonnam.hibernate4memcached.timestamper;
 
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
-import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperMemcachedImpl;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyPropertiesImpl;
 import org.hibernate.cfg.Settings;
@@ -22,6 +21,7 @@ import java.util.Properties;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +65,12 @@ public class HibernateCacheTimestamperMemcachedImplTest {
     private void givenTimestamperWithCacheRegionPrefix(String cacheRegionPrefix) {
         settings = settingsBuilder.setField(CACHE_REGION_PREFIX_FIELD_NAME, cacheRegionPrefix).build();
 
-        timestamper = new HibernateCacheTimestamperMemcachedImpl(settings, properties, memcachedAdapter);
+        timestamper = new HibernateCacheTimestamperMemcachedImpl();
+        timestamper.setSettings(settings);
+        timestamper.setProperties(properties);
+        timestamper.setMemcachedAdapter(memcachedAdapter);
+
+        timestamper.init();
     }
 
     @Test

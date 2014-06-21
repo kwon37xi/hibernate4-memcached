@@ -8,9 +8,15 @@ import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 * @author KwonNam Son (kwon37xi@gmail.com)
 */
 public class FakeMemcachedAdapter implements MemcachedAdapter {
+    boolean initCalled = false;
+
+    public boolean isInitCalled() {
+        return initCalled;
+    }
 
     @Override
     public void init(OverridableReadOnlyProperties properties) {
+        initCalled = true;
     }
 
     @Override

@@ -3,7 +3,7 @@ package kr.pe.kwonnam.hibernate4memcached;
 import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.regions.*;
 import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamper;
-import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperMemcachedImpl;
+import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperJvmImpl;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyPropertiesImpl;
 import kr.pe.kwonnam.hibernate4memcached.util.PropertiesUtils;
@@ -20,32 +20,21 @@ import java.util.Properties;
 
 /**
  * Hibernate 4 Memcached Cache Region Factory
- * <p/>
- * 설정할 것
- * memcached 최대 expiry second는 30일(days)
- * <p/>
- * - h4m.adapter.class=kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter
- * <p/>
- * <p/>
- * {@link org.hibernate.cfg.AvailableSettings#CACHE_PROVIDER_CONFIG}에 클래스패스로 설정파일 지정.
- * 아래 expiry 설정은 별도의 프라퍼티파일과 일반적인 JPA Property 혹은 Hibernate Property 모두로 설정가능하다.
- * <p/>
- * - h4m.expiry.seconds=600 # default value
- * - h4m.expiry.seconds.[regionprefix].org.hibernate.cache.internal.StandardQueryCache=600
- * - h4m.expiry.seconds.[regionprefix].org.hibernate.cache.spi.UpdateTimestampsCache=60 * 60 * 24 * 30;
- * - h4m.expiry.seconds.[regionprefix].xxx.yyy=300
- * - h4m.expiry.seconds.[regionprefix].xxx.zzz=500
  *
  * @author KwonNam Son (kwon37xi@gmail.com)
  */
 public class Hibernate4MemcachedRegionFactory implements RegionFactory {
     private final Logger log = LoggerFactory.getLogger(Hibernate4MemcachedRegionFactory.class);
 
-    /** Memcached Max expiry seconds is 30 days */
+    /**
+     * Memcached Max expiry seconds is 30 days
+     */
     public static final int MEMCACHED_MAX_EPIRY_SECONDS = 60 * 60 * 24 * 30;
 
     public static final String REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX = "h4m.expiry.seconds";
     public static final String MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY = "h4m.adapter.class";
+    public static final String TIMESTAMPER_PROPERTY_KEY = "h4m.timestamper.class";
+    public static final Class<?> DEFAULT_TIMESTAMPER_CLASS = HibernateCacheTimestamperJvmImpl.class;
 
     private Settings settings;
 
@@ -68,10 +57,10 @@ public class Hibernate4MemcachedRegionFactory implements RegionFactory {
 
         this.settings = settings;
         cacheProviderConfigProperties = populateCacheProviderConfigProperties(properties);
-        OverridableReadOnlyProperties mergedConfigProperties = new OverridableReadOnlyPropertiesImpl(properties, cacheProviderConfigProperties);
+        OverridableReadOnlyProperties mergedConfigProperties = new OverridableReadOnlyPropertiesImpl(properties,
+                cacheProviderConfigProperties);
         memcachedAdapter = populateMemcachedProvider(mergedConfigProperties);
-        memcachedAdapter.init(mergedConfigProperties);
-        hibernateCacheTimestamper = new HibernateCacheTimestamperMemcachedImpl(settings, mergedConfigProperties, memcachedAdapter);
+        hibernateCacheTimestamper = populateTimestamper(settings, mergedConfigProperties);
     }
 
     Properties populateCacheProviderConfigProperties(Properties properties) {
@@ -86,17 +75,35 @@ public class Hibernate4MemcachedRegionFactory implements RegionFactory {
     MemcachedAdapter populateMemcachedProvider(OverridableReadOnlyProperties properties) {
         String adapterClass = properties.getRequiredProperty(MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY);
 
-        MemcachedAdapter adapter = null;
+        MemcachedAdapter adapter;
         try {
             Class<?> clazz = Class.forName(adapterClass);
             adapter = (MemcachedAdapter) clazz.newInstance();
-
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
+        adapter.init(properties);
         return adapter;
     }
 
+    HibernateCacheTimestamper populateTimestamper(Settings settings, OverridableReadOnlyProperties properties) {
+        String timestamperClazzName = properties.getProperty(TIMESTAMPER_PROPERTY_KEY,
+                DEFAULT_TIMESTAMPER_CLASS.getName());
+
+        HibernateCacheTimestamper timestamper;
+        try {
+            Class<?> clazz = Class.forName(timestamperClazzName);
+            timestamper = (HibernateCacheTimestamper) clazz.newInstance();
+        } catch (Exception e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+
+        timestamper.setSettings(settings);
+        timestamper.setProperties(properties);
+        timestamper.setMemcachedAdapter(memcachedAdapter);
+        timestamper.init();
+        return timestamper;
+    }
 
     @Override
     public void stop() {
@@ -120,28 +127,35 @@ public class Hibernate4MemcachedRegionFactory implements RegionFactory {
     }
 
     @Override
-    public EntityRegion buildEntityRegion(String regionName, Properties properties, CacheDataDescription metadata) throws CacheException {
-        return new EntityMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties, cacheProviderConfigProperties), metadata, settings, memcachedAdapter, hibernateCacheTimestamper);
+    public EntityRegion buildEntityRegion(String regionName, Properties properties,
+                                          CacheDataDescription metadata) throws CacheException {
+        return new EntityMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties,
+                cacheProviderConfigProperties), metadata, settings, memcachedAdapter, hibernateCacheTimestamper);
     }
 
     @Override
-    public NaturalIdRegion buildNaturalIdRegion(String regionName, Properties properties, CacheDataDescription metadata) throws CacheException {
-        return new NaturalIdMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties, cacheProviderConfigProperties), metadata, settings, memcachedAdapter, hibernateCacheTimestamper);
+    public NaturalIdRegion buildNaturalIdRegion(String regionName, Properties properties,
+                                                CacheDataDescription metadata) throws CacheException {
+        return new NaturalIdMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties,
+                cacheProviderConfigProperties), metadata, settings, memcachedAdapter, hibernateCacheTimestamper);
     }
 
     @Override
-    public CollectionRegion buildCollectionRegion(String regionName, Properties properties, CacheDataDescription metadata)
-            throws CacheException {
-        return new CollectionMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties, cacheProviderConfigProperties), metadata, settings, memcachedAdapter, hibernateCacheTimestamper);
+    public CollectionRegion buildCollectionRegion(String regionName, Properties properties,
+                                                  CacheDataDescription metadata) throws CacheException {
+        return new CollectionMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties,
+                cacheProviderConfigProperties), metadata, settings, memcachedAdapter, hibernateCacheTimestamper);
     }
 
     @Override
     public QueryResultsRegion buildQueryResultsRegion(String regionName, Properties properties) throws CacheException {
-        return new QueryResultsMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties, cacheProviderConfigProperties), settings, memcachedAdapter, hibernateCacheTimestamper);
+        return new QueryResultsMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties,
+                cacheProviderConfigProperties), settings, memcachedAdapter, hibernateCacheTimestamper);
     }
 
     @Override
     public TimestampsRegion buildTimestampsRegion(String regionName, Properties properties) throws CacheException {
-        return new TimestampMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties, cacheProviderConfigProperties), settings, memcachedAdapter, hibernateCacheTimestamper);
+        return new TimestampMemcachedRegion(regionName, new OverridableReadOnlyPropertiesImpl(properties,
+                cacheProviderConfigProperties), settings, memcachedAdapter, hibernateCacheTimestamper);
     }
 }

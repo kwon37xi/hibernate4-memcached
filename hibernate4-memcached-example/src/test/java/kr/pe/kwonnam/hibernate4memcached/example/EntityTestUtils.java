@@ -3,6 +3,8 @@ package kr.pe.kwonnam.hibernate4memcached.example;
 import kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.KryoTranscoder;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter;
+import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperJvmImpl;
+import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperMemcachedImpl;
 import net.spy.memcached.DefaultHashAlgorithm;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.cfg.AvailableSettings;
@@ -33,7 +35,10 @@ public class EntityTestUtils {
         props.put(AvailableSettings.CACHE_PROVIDER_CONFIG, "META-INF/h4m-properties.xml");
         props.put(AvailableSettings.HBM2DDL_AUTO, "create");
         props.put(AvailableSettings.USE_STRUCTURED_CACHE, "false");
-        props.put(Hibernate4MemcachedRegionFactory.MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY, SpyMemcachedAdapter.class.getName());
+        props.put(Hibernate4MemcachedRegionFactory.MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY,
+                SpyMemcachedAdapter.class.getName());
+        props.put(Hibernate4MemcachedRegionFactory.TIMESTAMPER_PROPERTY_KEY, HibernateCacheTimestamperMemcachedImpl.class
+                .getName());
         props.put(SpyMemcachedAdapter.HOST_PROPERTY_KEY, "localhost:11211");
         props.put(SpyMemcachedAdapter.HASH_ALGORITHM_PROPERTY_KEY, DefaultHashAlgorithm.KETAMA_HASH.name());
         props.put(SpyMemcachedAdapter.OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY, "5000");

@@ -29,29 +29,40 @@ public class HibernateCacheTimestamperMemcachedImpl implements HibernateCacheTim
 
     private CacheNamespace cacheNamespace;
 
-    public HibernateCacheTimestamperMemcachedImpl(Settings settings, OverridableReadOnlyProperties properties,
-                                                  MemcachedAdapter memcachedAdapter) {
+    @Override
+    public void setSettings(Settings settings) {
         this.settings = settings;
+    }
+
+    @Override
+    public void setProperties(OverridableReadOnlyProperties properties) {
         this.properties = properties;
+    }
+
+    @Override
+    public void setMemcachedAdapter(MemcachedAdapter memcachedAdapter) {
         this.memcachedAdapter = memcachedAdapter;
+    }
 
-
+    @Override
+    public void init() {
         String cacheRegionPrefix = settings.getCacheRegionPrefix() == null ? "" : settings.getCacheRegionPrefix() + ".";
         cacheNamespace = new CacheNamespace(cacheRegionPrefix + HibernateCacheTimestamperMemcachedImpl.class
                 .getSimpleName(), false);
 
-        log.debug("memcached timestamper initialized. CacheNamespace : {}", cacheNamespace);
-    }
-
-    public CacheNamespace getCacheNamespace() {
-        return cacheNamespace;
+        log.debug("hibernate cache timestamper memcached implementation linitialized. CacheNamespace : {}",
+                cacheNamespace);
     }
 
     @Override
     public long next() {
         long next = memcachedAdapter.increaseCounter(cacheNamespace, TIMESTAMP_KEY, INCREASE_BY,
-                                                     System.currentTimeMillis(), EXPIRY_SECONDS);
-        log.debug("memcached timestamper next : {}", next);
+                System.currentTimeMillis(), EXPIRY_SECONDS);
+        log.debug("hibernate cache timestamper next : {}", next);
         return next;
+    }
+
+    public CacheNamespace getCacheNamespace() {
+        return cacheNamespace;
     }
 }
