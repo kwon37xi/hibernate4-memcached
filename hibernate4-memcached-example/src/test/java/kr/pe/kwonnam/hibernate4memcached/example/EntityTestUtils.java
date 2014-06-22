@@ -3,7 +3,6 @@ package kr.pe.kwonnam.hibernate4memcached.example;
 import kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.KryoTranscoder;
 import kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter;
-import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperJvmImpl;
 import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperMemcachedImpl;
 import net.spy.memcached.DefaultHashAlgorithm;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
