@@ -15,14 +15,14 @@ import net.jpountz.lz4.LZ4SafeDecompressor;
 public class Lz4CompressUtils {
     private static final LZ4Factory factory = LZ4Factory.fastestInstance();
 
-    public static byte[] compress(final byte[] data) {
-        if (data == null) {
-            throw new IllegalArgumentException("data must not be null.");
+    public static byte[] compress(final byte[] src) {
+        if (src == null) {
+            throw new IllegalArgumentException("src must not be null.");
         }
 
         LZ4Compressor compressor = factory.fastCompressor();
 
-        return compressor.compress(data);
+        return compressor.compress(src);
     }
 
     /**

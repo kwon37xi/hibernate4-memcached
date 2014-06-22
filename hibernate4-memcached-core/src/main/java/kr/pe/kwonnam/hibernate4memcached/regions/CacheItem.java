@@ -141,10 +141,6 @@ public class CacheItem implements Serializable {
 
     /**
      * Check if class version comparable.
-     *
-     * @param cacheEntry
-     * @param useStructuredCache
-     * @return
      */
     public static boolean checkIfClassVersionApplicable(Object cacheEntry, boolean useStructuredCache) {
         if (!useStructuredCache && cacheEntry instanceof CacheEntry) {

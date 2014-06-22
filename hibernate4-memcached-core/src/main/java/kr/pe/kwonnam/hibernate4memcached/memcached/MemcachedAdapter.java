@@ -54,7 +54,7 @@ public interface MemcachedAdapter {
      * @param cacheNamespace cache namespace
      * @param key            counter key
      * @param defaultValue   default value when the key missing
-     * @return
+     * @return current value of counter without increment
      */
     long getCounter(CacheNamespace cacheNamespace, String key, long defaultValue, int expirySeconds);
 

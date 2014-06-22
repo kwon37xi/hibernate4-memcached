@@ -48,7 +48,7 @@ public class Book implements Serializable {
     @ManyToMany
     @JoinTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id", referencedColumnName = "author_id"))
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @Cache(region = "books_authors", usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     public Collection<Author> authors;
 
     @Temporal(TemporalType.TIMESTAMP)

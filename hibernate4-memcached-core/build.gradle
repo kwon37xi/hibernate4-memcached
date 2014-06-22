@@ -2,5 +2,6 @@ dependencies {
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
     // lz4 for serialized data compression
     compile "net.jpountz.lz4:lz4:${lz4Version}"
-    compile 'org.apache.commons:commons-lang3:3.3.2'
+    compile "org.apache.commons:commons-lang3:${commonsLangVersion}"
+    compile "commons-codec:commons-codec:${commonsCodecVersion}"
 }

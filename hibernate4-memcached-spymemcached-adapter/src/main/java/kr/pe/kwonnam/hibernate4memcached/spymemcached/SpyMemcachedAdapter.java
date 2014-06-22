@@ -6,7 +6,6 @@ import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import net.spy.memcached.*;
 import net.spy.memcached.transcoders.Transcoder;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,15 +103,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     protected String createRegionPrefixedKey(CacheNamespace cacheNamespace, String key) {
         String regionNameWithSequence = getRegionNameWithSequence(cacheNamespace);
 
-        String regionPrefixedKey = regionNameWithSequence + ":" + key;
-        if (regionPrefixedKey.length() <= MAX_MEMCACHED_KEY_SIZE) {
-            return regionPrefixedKey;
-        }
-
-        String hashedRegionPrefixedKey = regionNameWithSequence + ":" + hashKey(key);
-        log.debug("region key is too long[{}]. hashing key by MD5+hashCode() [{}]", regionPrefixedKey, hashedRegionPrefixedKey);
-
-        return hashedRegionPrefixedKey;
+        return regionNameWithSequence + ":" + key;
     }
 
     String getRegionNameWithSequence(CacheNamespace cacheNamespace) {
@@ -128,10 +119,6 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
 
     String getRegionNameSequenceKey(CacheNamespace cacheNamespace) {
         return cacheNamespace.getName() + REGION_NAME_SQUENCE_SEPARATOR;
-    }
-
-    protected String hashKey(String key) {
-        return DigestUtils.md5Hex(key) + "_" + String.valueOf(key.hashCode());
     }
 
     String prefixWithCacheKeyPrefix(String key) {

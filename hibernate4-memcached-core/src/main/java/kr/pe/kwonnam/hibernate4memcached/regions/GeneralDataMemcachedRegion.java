@@ -11,12 +11,9 @@ import org.hibernate.cfg.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory
-        .REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX;
+import static kr.pe.kwonnam.hibernate4memcached.Hibernate4MemcachedRegionFactory.REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX;
 
 /**
- * 실제 캐시를 제어하는 일반 Region
- *
  * @author KwonNam Son (kwon37xi@gmail.com)
  */
 public class GeneralDataMemcachedRegion extends MemcachedRegion implements GeneralDataRegion {
@@ -46,7 +43,10 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
 
     @Override
     public Object get(Object key) throws CacheException {
-        Object cachedData = getMemcachedAdapter().get(getCacheNamespace(), String.valueOf(key));
+        String refinedKey = refineKey(key);
+
+        log.debug("Cache get [{}] : key[{}]", getCacheNamespace(), refinedKey);
+        Object cachedData = getMemcachedAdapter().get(getCacheNamespace(), refinedKey);
 
         if (cachedData == null) {
             return null;
@@ -70,23 +70,26 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
 
     @Override
     public void put(Object key, Object value) throws CacheException {
-        log.debug("Cache put [{}] : key[{}], value[{}]", getCacheNamespace(), key, value);
 
         Object valueToCache = value;
 
         boolean classVersionApplicable = CacheItem.checkIfClassVersionApplicable(value, getSettings().isStructuredCacheEntriesEnabled());
-        log.debug("Cache put classVersionApplicable : {}, {}", classVersionApplicable, value);
 
         if (classVersionApplicable) {
             valueToCache = new CacheItem(value, getSettings().isStructuredCacheEntriesEnabled());
         }
-        getMemcachedAdapter().set(getCacheNamespace(), String.valueOf(key), valueToCache, getExpiryInSeconds());
+
+        String refinedKey = refineKey(key);
+        log.debug("Cache put [{}] : key[{}], value[{}], classVersionApplicable : {}", getCacheNamespace(), refinedKey,
+                valueToCache, classVersionApplicable);
+        getMemcachedAdapter().set(getCacheNamespace(), refinedKey, valueToCache, getExpiryInSeconds());
     }
 
     @Override
     public void evict(Object key) throws CacheException {
-        log.debug("Cache evict[{}] : key[{}]", getCacheNamespace(), key);
-        getMemcachedAdapter().delete(getCacheNamespace(), String.valueOf(key));
+        String refinedKey = refineKey(key);
+        log.debug("Cache evict[{}] : key[{}]", getCacheNamespace(), refinedKey);
+        getMemcachedAdapter().delete(getCacheNamespace(), refinedKey);
     }
 
     @Override
@@ -96,9 +99,16 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
     }
 
     /**
-     * 설정 정보에서 캐시의 Expiry 초를 읽어서 리턴한다.
+     * Read expiry seconds from configuration properties
      */
     protected int getExpiryInSeconds() {
         return expirySeconds;
+    }
+
+    /**
+     * Memcached has limitation of key size. Shorten the key to avoid the limitation if needed.
+     */
+    protected String refineKey(Object key) {
+        return String.valueOf(key);
     }
 }

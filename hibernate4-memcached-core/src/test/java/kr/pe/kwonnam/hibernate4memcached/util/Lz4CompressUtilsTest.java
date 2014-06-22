@@ -41,6 +41,27 @@ public class Lz4CompressUtilsTest {
     }
 
     @Test
+    public void compress_without_src() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        Lz4CompressUtils.compress(null);
+
+    }
+
+    @Test
+    public void decompressSafe_without_src() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+
+        Lz4CompressUtils.decompressSafe(null, 10);
+    }
+
+    @Test
+    public void decompressFast_without_src() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+
+        Lz4CompressUtils.decompressFast(null, 0, 100);
+    }
+
+    @Test
     public void compress_and_decompressSafe() {
         byte[] compressed = Lz4CompressUtils.compress(ORIGINAL_DATA_BYTES);
 
