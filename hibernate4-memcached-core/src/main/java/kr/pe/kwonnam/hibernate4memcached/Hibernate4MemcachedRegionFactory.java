@@ -4,6 +4,7 @@ import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.regions.*;
 import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamper;
 import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperJvmImpl;
+import kr.pe.kwonnam.hibernate4memcached.timestamper.HibernateCacheTimestamperMemcachedImpl;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyPropertiesImpl;
 import kr.pe.kwonnam.hibernate4memcached.util.PropertiesUtils;
@@ -34,7 +35,7 @@ public class Hibernate4MemcachedRegionFactory implements RegionFactory {
     public static final String REGION_EXPIRY_SECONDS_PROPERTY_KEY_PREFIX = "h4m.expiry.seconds";
     public static final String MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY = "h4m.adapter.class";
     public static final String TIMESTAMPER_PROPERTY_KEY = "h4m.timestamper.class";
-    public static final Class<?> DEFAULT_TIMESTAMPER_CLASS = HibernateCacheTimestamperJvmImpl.class;
+    public static final Class<?> DEFAULT_TIMESTAMPER_CLASS = HibernateCacheTimestamperMemcachedImpl.class;
 
     private Settings settings;
 
