@@ -25,7 +25,6 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     public static final String TRANSCODER_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".transcoder";
     public static final String CACHE_KEY_PREFIX_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".cachekey.prefix";
 
-    public static final int MAX_MEMCACHED_KEY_SIZE = 250;
     public static final String REGION_NAME_SQUENCE_SEPARATOR = "@";
 
     public static final int DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS = Hibernate4MemcachedRegionFactory.MEMCACHED_MAX_EPIRY_SECONDS;
@@ -38,28 +37,27 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
 
     @Override
     public void init(OverridableReadOnlyProperties properties) {
-        ConnectionFactoryBuilder builder = getConnectionFactoryBuilder(properties);
-
-        try {
-            String addresses = properties.getRequiredProperty(HOST_PROPERTY_KEY);
-            memcachedClient = createMemcachedClient(builder, addresses);
-        } catch (IOException e) {
-            throw new IllegalStateException(e.getMessage(), e);
-        }
-
+        memcachedClient = createMemcachedClient(properties);
         cacheKeyPrefix = properties.getProperty(CACHE_KEY_PREFIX_PROPERTY_KEY, "");
+
         log.debug("Set cachekey prefix : [{}]", cacheKeyPrefix);
     }
 
-    private MemcachedClient createMemcachedClient(ConnectionFactoryBuilder builder, String addresses) throws IOException {
-        return new MemcachedClient(builder.build(), AddrUtil.getAddresses(addresses));
+    protected MemcachedClientIF createMemcachedClient(OverridableReadOnlyProperties properties) {
+        ConnectionFactoryBuilder builder = createConnectionFactoryBuilder(properties);
+
+        try {
+            String addresses = properties.getRequiredProperty(HOST_PROPERTY_KEY);
+            return new MemcachedClient(builder.build(), AddrUtil.getAddresses(addresses));
+        } catch (IOException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
     }
 
     /**
-     * ConnectionFactoryBuilder 생성. 더 상세 설정이 필요할 경우, 상속하여
-     * 이 부분을 Override 한다.
+     * creating ConnectionFactoryBuilder object. Override thid method if you need.
      */
-    protected ConnectionFactoryBuilder getConnectionFactoryBuilder(OverridableReadOnlyProperties properties) {
+    protected ConnectionFactoryBuilder createConnectionFactoryBuilder(OverridableReadOnlyProperties properties) {
         ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
         // BINARY Only!!! spymemcached incr/decr correctly supports only BINARY mode.
         builder.setProtocol(ConnectionFactoryBuilder.Protocol.BINARY);
@@ -82,11 +80,10 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     private Transcoder<Object> createTranscoder(OverridableReadOnlyProperties properties, String transcoderClassProperty) {
         try {
             @SuppressWarnings("unchecked")
-            Class<Transcoder<Object>> transcoderClass = (Class<Transcoder<Object>>) Class.forName(transcoderClassProperty);
-            Constructor<Transcoder<Object>> constructor = transcoderClass.getConstructor(OverridableReadOnlyProperties.class);
-
-            return constructor.newInstance(properties);
-
+            Class<InitializableTranscoder<Object>> transcoderClass = (Class<InitializableTranscoder<Object>>) Class.forName(transcoderClassProperty);
+            InitializableTranscoder<Object> transcoder = transcoderClass.newInstance();
+            transcoder.init(properties);
+            return transcoder;
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage(), e);
         }

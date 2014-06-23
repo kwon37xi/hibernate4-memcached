@@ -9,7 +9,6 @@ import kr.pe.kwonnam.hibernate4memcached.util.IntToBytesUtils;
 import kr.pe.kwonnam.hibernate4memcached.util.Lz4CompressUtils;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import net.spy.memcached.CachedData;
-import net.spy.memcached.transcoders.Transcoder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +17,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * * LZ4 압축 필요 용량 : h4m.adapter.spymemcached.kryotranscoder.compression.threashold.bytes=20000
+ * Default transcoder for {@link SpyMemcachedAdapter}.
+ *
+ * This transcoder uses Kryo Serializer and compress data with Lz4 when data size is greater than compression
+ * threashold.
+ *
+ * @author KwonNam Son (kwon37xi@gmail.com)
  */
-public class KryoTranscoder implements Transcoder<Object> {
+public class KryoTranscoder implements InitializableTranscoder<Object> {
     private Logger log = LoggerFactory.getLogger(KryoTranscoder.class);
 
     public static final String COMPRESSION_THREASHOLD_PROPERTY_KEY = SpyMemcachedAdapter.PROPERTY_KEY_PREFIX + ".kryotranscoder.compression.threashold.bytes";
@@ -39,16 +43,10 @@ public class KryoTranscoder implements Transcoder<Object> {
 
     private int compressionThreasholdBytes;
 
-    /**
-     * Transcoder must have a constructor with a Properties argument.
-     */
-    public KryoTranscoder(OverridableReadOnlyProperties properties) {
+    @Override
+    public void init(OverridableReadOnlyProperties properties) {
         this.properties = properties;
 
-        populateCompressionThreasholdBytes(properties);
-    }
-
-    private void populateCompressionThreasholdBytes(OverridableReadOnlyProperties properties) {
         String compressionThreasholdBytesProperty = properties.getRequiredProperty(COMPRESSION_THREASHOLD_PROPERTY_KEY);
         compressionThreasholdBytes = Integer.parseInt(compressionThreasholdBytesProperty);
     }
