@@ -70,7 +70,6 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
     @Override
     public void unlockItem(Object key, SoftLock lock) throws CacheException {
         log.debug("region access strategy unlockItem() {} {}", getInternalRegion().getCacheNamespace(), key);
-        evict(key);
     }
 
     /**
@@ -86,14 +85,12 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
     }
 
     /**
-     * 트랜잭션 완료전의 remove 작업 수행.
-     * memcached와는 무관한 것임.
-     *
      * @see org.hibernate.cache.spi.access.RegionAccessStrategy#remove(java.lang.Object)
      */
     @Override
     public void remove(Object key) throws CacheException {
         log.debug("region access strategy remove() {} {}", getInternalRegion().getCacheNamespace(), key);
+        evict(key);
     }
 
     /**

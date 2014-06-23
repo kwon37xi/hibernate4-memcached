@@ -105,7 +105,9 @@ public class CacheTest {
             @Override
             public void process(EntityManager em) {
                 // Book 1 update
+
                 Book book = em.find(Book.class, 1L);
+                log.warn("First book will be updated: {}", book);
                 book.setDescription(book.getDescription() + " 설명추가");
                 em.merge(book);
             }
