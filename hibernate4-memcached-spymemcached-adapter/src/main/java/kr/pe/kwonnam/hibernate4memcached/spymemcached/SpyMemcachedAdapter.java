@@ -6,11 +6,11 @@ import kr.pe.kwonnam.hibernate4memcached.memcached.MemcachedAdapter;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import net.spy.memcached.*;
 import net.spy.memcached.transcoders.Transcoder;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 
 /**
  * SpymemcachedAdapter for hibernate4memcached.
@@ -25,9 +25,9 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     public static final String TRANSCODER_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".transcoder";
     public static final String CACHE_KEY_PREFIX_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".cachekey.prefix";
 
-    public static final String REGION_NAME_SQUENCE_SEPARATOR = "@";
+    public static final String NAMESPACE_NAME_SQUENCE_SEPARATOR = "@";
 
-    public static final int DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS = Hibernate4MemcachedRegionFactory.MEMCACHED_MAX_EPIRY_SECONDS;
+    public static final int DEFAULT_NAMESPACE_SEQUENCE_EXPIRY_SECONDS = Hibernate4MemcachedRegionFactory.MEMCACHED_MAX_EPIRY_SECONDS;
 
     private Logger log = LoggerFactory.getLogger(SpyMemcachedAdapter.class);
 
@@ -35,12 +35,20 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
 
     private String cacheKeyPrefix = "";
 
+    public void setMemcachedClient(MemcachedClientIF memcachedClient) {
+        this.memcachedClient = memcachedClient;
+    }
+
+    public void setCacheKeyPrefix(String cacheKeyPrefix) {
+        this.cacheKeyPrefix = cacheKeyPrefix;
+    }
+
     @Override
     public void init(OverridableReadOnlyProperties properties) {
         memcachedClient = createMemcachedClient(properties);
         cacheKeyPrefix = properties.getProperty(CACHE_KEY_PREFIX_PROPERTY_KEY, "");
 
-        log.debug("Set cachekey prefix : [{}]", cacheKeyPrefix);
+        log.debug("spymemcachedadapter cachekeyprefix : [{}]", cacheKeyPrefix);
     }
 
     protected MemcachedClientIF createMemcachedClient(OverridableReadOnlyProperties properties) {
@@ -89,83 +97,77 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
         }
     }
 
+    /**
+     * Return cache namespace decorated key.
+     *
+     * @param cacheNamespace cache namespace
+     * @param key            cache key
+     * @return namespace infomation prefixed cache key
+     */
+    String getNamespacedKey(CacheNamespace cacheNamespace, String key) {
+        String namespaceIndicator = getNamespaceIndicator(cacheNamespace);
+
+        if (cacheNamespace.isNamespaceExpirationRequired() == false) {
+            return namespaceIndicator + ":" + key;
+        }
+
+        String namespaceIndicatorKey = namespaceIndicator + NAMESPACE_NAME_SQUENCE_SEPARATOR;
+        long namespaceSquence = memcachedClient.incr(namespaceIndicatorKey, 0L, System.currentTimeMillis(),
+                DEFAULT_NAMESPACE_SEQUENCE_EXPIRY_SECONDS);
+
+        return namespaceIndicatorKey + namespaceSquence + ":" + key;
+    }
+
+    private String getNamespaceIndicator(CacheNamespace cacheNamespace) {
+        return (StringUtils.isBlank(cacheKeyPrefix) ? "" : cacheKeyPrefix + ".") + cacheNamespace.getName();
+    }
+
     @Override
     public void destroy() {
         memcachedClient.shutdown();
     }
 
-    /**
-     * Cache Region과 key를 조합하여 새로운 key를 생성한다.
-     */
-    protected String createRegionPrefixedKey(CacheNamespace cacheNamespace, String key) {
-        String regionNameWithSequence = getRegionNameWithSequence(cacheNamespace);
-
-        return regionNameWithSequence + ":" + key;
-    }
-
-    String getRegionNameWithSequence(CacheNamespace cacheNamespace) {
-        if (!cacheNamespace.isNamespaceExpirationRequired()) {
-            return cacheNamespace.getName();
-        }
-
-        String regionNameSequenceKey = prefixWithCacheKeyPrefix(getRegionNameSequenceKey(cacheNamespace));
-        Long sequence = memcachedClient.incr(regionNameSequenceKey, 0L, System.currentTimeMillis(), DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS);
-        log.debug("SpyMemcached getRegionNameWithSequence {}{}", regionNameSequenceKey, sequence);
-        return cacheNamespace.getName() + REGION_NAME_SQUENCE_SEPARATOR + sequence;
-    }
-
-    String getRegionNameSequenceKey(CacheNamespace cacheNamespace) {
-        return cacheNamespace.getName() + REGION_NAME_SQUENCE_SEPARATOR;
-    }
-
-    String prefixWithCacheKeyPrefix(String key) {
-        if (cacheKeyPrefix == null || cacheKeyPrefix.length() == 0) {
-            return key;
-        }
-
-        return cacheKeyPrefix + "." + key;
-    }
-
     @Override
     public Object get(CacheNamespace cacheNamespace, String key) {
-        String regionPrefixedKey = prefixWithCacheKeyPrefix(createRegionPrefixedKey(cacheNamespace, key));
+        String namespacedKey = getNamespacedKey(cacheNamespace, key);
 
-        Object value = memcachedClient.get(regionPrefixedKey);
-        log.debug("Spymemcached Get key [{}], hit {}.", regionPrefixedKey, value != null);
+        Object value = memcachedClient.get(namespacedKey);
+        log.debug("spymemcachedadapter get key [{}], hit {}.", namespacedKey, value != null);
         return value;
     }
 
     @Override
     public void set(CacheNamespace cacheNamespace, String key, Object value, int expirySeconds) {
-        String regionPrefixedKey = prefixWithCacheKeyPrefix(createRegionPrefixedKey(cacheNamespace, key));
+        String namespacedKey = getNamespacedKey(cacheNamespace, key);
 
-        log.debug("Spymemcached Set key [{}], value [{}], expirySeconds [{}] .", regionPrefixedKey, value, expirySeconds);
-        memcachedClient.set(regionPrefixedKey, expirySeconds, value);
+        log.debug("spymemcachedadapter set key [{}], value [{}], expirySeconds [{}] .", namespacedKey, value,
+                expirySeconds);
+        memcachedClient.set(namespacedKey, expirySeconds, value);
     }
 
     @Override
     public void delete(CacheNamespace cacheNamespace, String key) {
-        String regionPrefixedKey = prefixWithCacheKeyPrefix(createRegionPrefixedKey(cacheNamespace, key));
-        log.debug("Spymemcached Delete key [{}].", regionPrefixedKey);
+        String namespacedKey = getNamespacedKey(cacheNamespace, key);
 
-        memcachedClient.delete(regionPrefixedKey);
+        log.debug("spymemcachedadapter delete key [{}].", namespacedKey);
+        memcachedClient.delete(namespacedKey);
     }
 
     @Override
     public long increaseCounter(CacheNamespace cacheNamespace, String key, long by, long defaultValue, int expirySeconds) {
-        String regionPrefixedKey = prefixWithCacheKeyPrefix(createRegionPrefixedKey(cacheNamespace, key));
-        long counterValue = memcachedClient.incr(regionPrefixedKey, by, defaultValue, expirySeconds);
-        log.debug("Spymemcached increase counter key [{}] with by {} default value {} returns {}", regionPrefixedKey, by, defaultValue, counterValue);
+        String namespacedKey = getNamespacedKey(cacheNamespace, key);
+        long counterValue = memcachedClient.incr(namespacedKey, by, defaultValue, expirySeconds);
+        log.debug("spymemcachedadapter increase counter key [{}] with by {} default value {} returns {}", namespacedKey, by, defaultValue, counterValue);
 
         return counterValue;
     }
 
     @Override
     public long getCounter(CacheNamespace cacheNamespace, String key, long defaultValue, int expirySeconds) {
-        String regionPrefixedKey = prefixWithCacheKeyPrefix(createRegionPrefixedKey(cacheNamespace, key));
-        long counterValue = memcachedClient.incr(regionPrefixedKey, 0, defaultValue, expirySeconds);
+        String namespacedKey = getNamespacedKey(cacheNamespace, key);
+        long counterValue = memcachedClient.incr(namespacedKey, 0, defaultValue, expirySeconds);
 
-        log.debug("Spymemcached get counter key [{}] with default value {} returns {}", regionPrefixedKey, defaultValue, counterValue);
+        log.debug("spymemcachedadapter get counter key [{}] with default value {} returns {}", namespacedKey, defaultValue, counterValue);
 
         return counterValue;
     }
@@ -173,12 +175,13 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     @Override
     public void evictAll(CacheNamespace cacheNamespace) {
         if (!cacheNamespace.isNamespaceExpirationRequired()) {
-            log.debug("Spymemcached region Evict {} requested but did nothing because regionExpirationRequired == false.", cacheNamespace);
+            log.debug("spymemcachedadapter region evict {} nothins done, because regionExpirationRequired == false.", cacheNamespace);
             return;
         }
 
-        String rergionPrefixedKey = prefixWithCacheKeyPrefix(getRegionNameSequenceKey(cacheNamespace));
-        long nextSequence = memcachedClient.incr(rergionPrefixedKey, 1, System.currentTimeMillis(), DEFAULT_REGION_SEQUENCE_EXPIRY_SECONDS);
-        log.debug("Spymemcached region Evicted prefix : {}, cacheNamespace: {}, nextSequence {}", rergionPrefixedKey, cacheNamespace, nextSequence);
+        String namespaceIndicatorKey = getNamespaceIndicator(cacheNamespace) + NAMESPACE_NAME_SQUENCE_SEPARATOR;
+        long nextSequence = memcachedClient.incr(namespaceIndicatorKey, 1, System.currentTimeMillis(), DEFAULT_NAMESPACE_SEQUENCE_EXPIRY_SECONDS);
+        log.debug("spymemcachedadapter region evicted namespaceIndicatorKey : {}, cacheNamespace: {}, nextSequence {}",
+                namespaceIndicatorKey, cacheNamespace, nextSequence);
     }
 }

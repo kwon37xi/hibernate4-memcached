@@ -118,7 +118,9 @@ public class MemcachedRegion implements Region {
 
     @Override
     public long nextTimestamp() {
-        return hibernateCacheTimestamper.next();
+        long next = hibernateCacheTimestamper.next();
+        log.debug("region nextTimestamp : {}", next);
+        return next;
     }
 
     @Override
