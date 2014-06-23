@@ -36,8 +36,6 @@ public class EntityTestUtils {
         props.put(AvailableSettings.USE_STRUCTURED_CACHE, "false");
         props.put(Hibernate4MemcachedRegionFactory.MEMCACHED_ADAPTER_CLASS_PROPERTY_KEY,
                 SpyMemcachedAdapter.class.getName());
-        props.put(Hibernate4MemcachedRegionFactory.TIMESTAMPER_PROPERTY_KEY, HibernateCacheTimestamperMemcachedImpl.class
-                .getName());
         props.put(SpyMemcachedAdapter.HOST_PROPERTY_KEY, "localhost:11211");
         props.put(SpyMemcachedAdapter.HASH_ALGORITHM_PROPERTY_KEY, DefaultHashAlgorithm.KETAMA_HASH.name());
         props.put(SpyMemcachedAdapter.OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY, "5000");
