@@ -39,6 +39,7 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
         }
 
         expirySeconds = Integer.parseInt(expirySecondsProperty);
+        log.info("expirySeconds of cache region [{}] - {} seconds.", getCacheNamespace().getName(), expirySeconds);
     }
 
     @Override
