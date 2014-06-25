@@ -3,8 +3,7 @@ package kr.pe.kwonnam.hibernate4memcached.spymemcached;
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyPropertiesImpl;
-import net.spy.memcached.CachedData;
-import net.spy.memcached.MemcachedClientIF;
+import net.spy.memcached.*;
 import net.spy.memcached.transcoders.Transcoder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -18,7 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Properties;
 
-import static kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter.DEFAULT_NAMESPACE_SEQUENCE_EXPIRY_SECONDS;
+import static kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter.*;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -56,11 +55,19 @@ public class SpyMemcachedAdapterTest {
     }
 
     @Test
-    public void createTranscoder() throws Exception {
-        OverridableReadOnlyProperties properties = new OverridableReadOnlyPropertiesImpl(new Properties());
+    public void createConnectionFactoryBuilder() throws Exception {
+        Properties props = new Properties();
+        props.setProperty(HASH_ALGORITHM_PROPERTY_KEY, DefaultHashAlgorithm.NATIVE_HASH.name());
+        props.setProperty(OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY, String.valueOf(13579));
+        props.setProperty(TRANSCODER_PROPERTY_KEY, FakeTranscoder.class.getName());
 
-        Transcoder<Object> transcoder = spyMemcachedAdapter.createTranscoder(properties, FakeTranscoder.class.getName());
+        ConnectionFactoryBuilder builder = spyMemcachedAdapter.createConnectionFactoryBuilder(new OverridableReadOnlyPropertiesImpl(props));
 
+        ConnectionFactory connectionFactory = builder.build();
+        assertThat(connectionFactory.getHashAlg()).isEqualTo(DefaultHashAlgorithm.NATIVE_HASH);
+        assertThat(connectionFactory.getOperationTimeout()).isEqualTo(13579);
+
+        Transcoder<Object> transcoder = connectionFactory.getDefaultTranscoder();
         assertThat(transcoder).isExactlyInstanceOf(FakeTranscoder.class);
         FakeTranscoder fakeTranscoder = (FakeTranscoder) transcoder;
         assertThat(fakeTranscoder.isInitialized()).isTrue();

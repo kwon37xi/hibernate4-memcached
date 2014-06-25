@@ -85,7 +85,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
         return builder;
     }
 
-    protected Transcoder<Object> createTranscoder(OverridableReadOnlyProperties properties, String transcoderClassProperty) {
+    private Transcoder<Object> createTranscoder(OverridableReadOnlyProperties properties, String transcoderClassProperty) {
         try {
             @SuppressWarnings("unchecked")
             Class<InitializableTranscoder<Object>> transcoderClass = (Class<InitializableTranscoder<Object>>) Class.forName(transcoderClassProperty);
@@ -93,7 +93,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
             transcoder.init(properties);
             return transcoder;
         } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            throw new IllegalStateException("Failed to create Transcoder object.", e);
         }
     }
 
