@@ -85,7 +85,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
         return builder;
     }
 
-    private Transcoder<Object> createTranscoder(OverridableReadOnlyProperties properties, String transcoderClassProperty) {
+    protected Transcoder<Object> createTranscoder(OverridableReadOnlyProperties properties, String transcoderClassProperty) {
         try {
             @SuppressWarnings("unchecked")
             Class<InitializableTranscoder<Object>> transcoderClass = (Class<InitializableTranscoder<Object>>) Class.forName(transcoderClassProperty);

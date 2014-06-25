@@ -1,7 +1,11 @@
 package kr.pe.kwonnam.hibernate4memcached.spymemcached;
 
 import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
+import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
+import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyPropertiesImpl;
+import net.spy.memcached.CachedData;
 import net.spy.memcached.MemcachedClientIF;
+import net.spy.memcached.transcoders.Transcoder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,6 +15,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Properties;
 
 import static kr.pe.kwonnam.hibernate4memcached.spymemcached.SpyMemcachedAdapter.DEFAULT_NAMESPACE_SEQUENCE_EXPIRY_SECONDS;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -47,6 +53,17 @@ public class SpyMemcachedAdapterTest {
         spyMemcachedAdapter = spy(spyMemcachedAdapter);
 
         startTimeMills = System.currentTimeMillis();
+    }
+
+    @Test
+    public void createTranscoder() throws Exception {
+        OverridableReadOnlyProperties properties = new OverridableReadOnlyPropertiesImpl(new Properties());
+
+        Transcoder<Object> transcoder = spyMemcachedAdapter.createTranscoder(properties, FakeTranscoder.class.getName());
+
+        assertThat(transcoder).isExactlyInstanceOf(FakeTranscoder.class);
+        FakeTranscoder fakeTranscoder = (FakeTranscoder) transcoder;
+        assertThat(fakeTranscoder.isInitialized()).isTrue();
     }
 
     @Test
@@ -185,5 +202,37 @@ public class SpyMemcachedAdapterTest {
 
         verify(memcachedClient).incr(eq("people@"), eq(1), longCaptor.capture(), eq(DEFAULT_NAMESPACE_SEQUENCE_EXPIRY_SECONDS));
         assertSystemCurrentTimeMillis(longCaptor.getValue());
+    }
+
+    public static class FakeTranscoder implements InitializableTranscoder<Object> {
+        private boolean initialized = false;
+        public boolean isInitialized() {
+            return initialized;
+        }
+
+        @Override
+        public boolean asyncDecode(CachedData d) {
+            return false;
+        }
+
+        @Override
+        public CachedData encode(Object o) {
+            return null;
+        }
+
+        @Override
+        public Object decode(CachedData d) {
+            return null;
+        }
+
+        @Override
+        public int getMaxSize() {
+            return 0;
+        }
+
+        @Override
+        public void init(OverridableReadOnlyProperties properties) {
+            initialized = true;
+        }
     }
 }
