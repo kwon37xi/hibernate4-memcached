@@ -5,6 +5,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -33,7 +35,13 @@ public class OverridableReadOnlyPropertiesImplTest {
     @Test
     public void constructor_null_array() throws Exception {
         expectedException.expect(IllegalArgumentException.class);
-        new OverridableReadOnlyPropertiesImpl();
+        new OverridableReadOnlyPropertiesImpl((List<Properties>) null);
+    }
+
+    @Test
+    public void constructor_empty_array() throws Exception {
+        expectedException.expect(IllegalArgumentException.class);
+        new OverridableReadOnlyPropertiesImpl(new ArrayList<Properties>());
     }
 
     @Test
@@ -71,7 +79,7 @@ public class OverridableReadOnlyPropertiesImplTest {
     @Test
     public void getRequiredProperty_no_value() throws Exception {
         expectedException.expect(IllegalStateException.class);
-        
+
         overridableReadOnlyPropertiesImpl.getRequiredProperty("some.not.exists.key");
     }
 }
