@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * @author KwonNam Son (kwon37xi@gmail.com)
  */
 public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNaturalIdMemcachedRegionAccessStrategy {
     private Logger log = LoggerFactory.getLogger(NonstrictReadWriteNaturalIdRegionAccessStrategy.class);
@@ -31,7 +31,7 @@ public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNatural
     }
 
     /**
-     * nostrict-read-write에서는 불필요한 작업
+     * not necessary in nostrict-read-write
      *
      * @see org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy
      */
@@ -42,7 +42,7 @@ public class NonstrictReadWriteNaturalIdRegionAccessStrategy extends BaseNatural
     }
 
     /**
-     * update 후에 기존 캐시를 삭제해야 한다. 캐시를 갱신하는 작업은 읽기 요청이 들어왔을 때 한다.
+     * need evict the key, after update.
      *
      * @see org.hibernate.cache.spi.access.NaturalIdRegionAccessStrategy
      */

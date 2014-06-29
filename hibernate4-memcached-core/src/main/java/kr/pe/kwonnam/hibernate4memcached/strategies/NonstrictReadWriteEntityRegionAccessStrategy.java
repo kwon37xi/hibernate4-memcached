@@ -31,7 +31,7 @@ public class NonstrictReadWriteEntityRegionAccessStrategy extends BaseEntityMemc
     }
 
     /**
-     * nostrict-read-write에서는 불필요한 작업
+     * not necessary in nostrict-read-write
      *
      * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
      */
@@ -42,7 +42,7 @@ public class NonstrictReadWriteEntityRegionAccessStrategy extends BaseEntityMemc
     }
 
     /**
-     * update 후, 기존 캐시를 삭제해줘야 한다.
+     * need evict the key, after update.
      *
      * @see org.hibernate.cache.spi.access.EntityRegionAccessStrategy
      */
