@@ -33,7 +33,7 @@ public class NaturalIdMemcachedRegion extends TransactionalDataMemcachedRegion i
             case NONSTRICT_READ_WRITE:
                 return new NonstrictReadWriteNaturalIdRegionAccessStrategy(this);
             default:
-                throw new IllegalStateException("Unsupported access strategy : " + accessType + ".");
+                throw new CacheException("Unsupported access strategy : " + accessType + ".");
         }
     }
 }

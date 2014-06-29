@@ -8,10 +8,11 @@ import org.hibernate.cache.spi.TimestampsRegion;
 import org.hibernate.cfg.Settings;
 
 /**
- * {@link org.hibernate.cache.spi.TimestampsRegion}은 strategy가 없다.
- * <code>[cache-region-prefix.]org.hibernate.cache.spi.UpdateTimestampsCache</code>를 다룬다.
+ * {@link org.hibernate.cache.spi.TimestampsRegion} has no concurrency strategy.
+ * It deals <code>[cache-region-prefix.]org.hibernate.cache.spi.UpdateTimestampsCache</code>.
  * <p/>
- * 해당 region에 대해 expirySeconds를 최대로 잡아줄 것.
+ *
+ * This region should have very long expiry seconds.
  *
  * @author KwonNam Son (kwon37xi@gmail.com)
  */

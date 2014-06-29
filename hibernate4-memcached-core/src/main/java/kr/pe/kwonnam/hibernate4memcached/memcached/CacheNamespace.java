@@ -1,5 +1,9 @@
 package kr.pe.kwonnam.hibernate4memcached.memcached;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -36,29 +40,29 @@ public class CacheNamespace implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) {
+            return false;
+        }
+        if (this == o) {
+            return true;
+        }
+        if (getClass() != o.getClass()) {
+            return false;
+        }
 
-        CacheNamespace that = (CacheNamespace) o;
+        CacheNamespace otherCacheNamespace = (CacheNamespace) o;
 
-        if (namespaceExpirationRequired != that.namespaceExpirationRequired) return false;
-        if (!name.equals(that.name)) return false;
-
-        return true;
+        return new EqualsBuilder().append(name, otherCacheNamespace.name)
+                .append(namespaceExpirationRequired, otherCacheNamespace.namespaceExpirationRequired).isEquals();
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + (namespaceExpirationRequired ? 1 : 0);
-        return result;
+        return new HashCodeBuilder().append(name).append(namespaceExpirationRequired).toHashCode();
     }
 
     @Override
     public String toString() {
-        return "CacheNamespace{" +
-                "name='" + name + '\'' +
-                ", namespaceExpirationRequired=" + namespaceExpirationRequired +
-                '}';
+        return new ToStringBuilder(this).append("name", name).append("namespaceExpirationRequired", namespaceExpirationRequired).toString();
     }
 }

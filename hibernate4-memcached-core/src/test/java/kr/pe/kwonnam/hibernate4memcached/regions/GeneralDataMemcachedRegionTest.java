@@ -198,6 +198,25 @@ public class GeneralDataMemcachedRegionTest {
         assertThat(cacheItem.getTargetClassName()).isEqualTo(String.class.getName());
     }
 
+    @Test
+    public void evict() throws Exception {
+        givenRegionWithDefaultProperties();
+        String key = "books#1";
+
+        generalDataMemcachedRegion.evict(key);
+
+        verify(memcachedAdapter).delete(cacheNamespace, refineKey(key));
+    }
+
+    @Test
+    public void evictAll() throws Exception {
+        givenRegionWithDefaultProperties();
+
+        generalDataMemcachedRegion.evictAll();
+
+        verify(memcachedAdapter).evictAll(cacheNamespace);
+    }
+
     public class RefineKeyOverridedGeneralDataMemcachedRegion extends GeneralDataMemcachedRegion {
 
         public RefineKeyOverridedGeneralDataMemcachedRegion(CacheNamespace cacheNamespace,

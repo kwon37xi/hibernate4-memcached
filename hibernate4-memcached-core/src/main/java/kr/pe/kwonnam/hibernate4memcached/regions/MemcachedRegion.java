@@ -69,6 +69,9 @@ public class MemcachedRegion implements Region {
         return hibernateCacheTimestamper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         return cacheNamespace.getName();
@@ -88,6 +91,9 @@ public class MemcachedRegion implements Region {
         // do nothing. NEVER evict cache region!!
     }
 
+    /**
+     * Memcached does not support contains or exists operation.
+     */
     @Override
     public boolean contains(Object key) {
         return false;

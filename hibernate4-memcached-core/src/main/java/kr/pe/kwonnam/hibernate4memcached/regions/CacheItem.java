@@ -1,5 +1,8 @@
 package kr.pe.kwonnam.hibernate4memcached.regions;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.cache.spi.entry.CacheEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,35 +158,40 @@ public class CacheItem implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) {
+            return false;
+        }
+        if (this == o) {
+            return true;
+        }
+        if (getClass() != o.getClass()) {
+            return false;
+        }
 
-        CacheItem cacheItem = (CacheItem) o;
+        CacheItem otherCacheItem = (CacheItem) o;
 
-        if (targetClassSerialVersionUID != cacheItem.targetClassSerialVersionUID) return false;
-        if (useStructuredCache != cacheItem.useStructuredCache) return false;
-        if (!cacheEntry.equals(cacheItem.cacheEntry)) return false;
-        if (!targetClassName.equals(cacheItem.targetClassName)) return false;
-
-        return true;
+        return new EqualsBuilder().append(targetClassSerialVersionUID, otherCacheItem.targetClassSerialVersionUID)
+                .append(useStructuredCache, otherCacheItem.useStructuredCache)
+                .append(cacheEntry, otherCacheItem.cacheEntry)
+                .append(targetClassName, otherCacheItem.targetClassName)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        int result = cacheEntry.hashCode();
-        result = 31 * result + targetClassName.hashCode();
-        result = 31 * result + (int) (targetClassSerialVersionUID ^ (targetClassSerialVersionUID >>> 32));
-        result = 31 * result + (useStructuredCache ? 1 : 0);
-        return result;
+        return new HashCodeBuilder().append(cacheEntry)
+                .append(targetClassName)
+                .append(targetClassSerialVersionUID)
+                .append(useStructuredCache)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
-        return "CacheItem{" +
-                "cacheEntry=" + cacheEntry +
-                ", targetClassName='" + targetClassName + '\'' +
-                ", targetClassSerialVersionUID=" + targetClassSerialVersionUID +
-                ", useStructuredCache=" + useStructuredCache +
-                '}';
+
+        return new ToStringBuilder(this).append("cacheEntry", cacheEntry).append("targetClassName", targetClassName)
+                .append("targetClassSerialVersionUID", targetClassSerialVersionUID)
+                .append("useStrucuturedCache", useStructuredCache)
+                .toString();
     }
 }
