@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 import java.util.Date;
 
 /**
@@ -66,6 +67,16 @@ public class ReadOnlyTest {
         } finally {
             EntityTestUtils.stop(em);
         }
+
+        log.debug("### Delete with query!");
+        em = EntityTestUtils.start();
+        transaction = em.getTransaction();
+        transaction.begin();
+        Query query = em.createQuery("delete from Person where id = :id");
+        query.setParameter("id", 1L);
+        query.executeUpdate();
+        transaction.commit();
+        EntityTestUtils.stop(em);
     }
 
     @After

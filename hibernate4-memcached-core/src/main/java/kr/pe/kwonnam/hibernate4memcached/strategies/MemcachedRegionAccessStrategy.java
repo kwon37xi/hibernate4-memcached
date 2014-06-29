@@ -8,6 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Basic Memcached Region Access Strategy.
+ * <p/>
+ * This strategy is for READ_ONLY and NONSTRICT_READ_WRITE.
+ * This is not suitable for READ_WRITE and TRANSACTIONAL.
+ * READ_WRITE, TRANSACTION strategy must override this class's methods.
+ *
  * @author KwonNam Son (kwon37xi@gmail.com)
  */
 public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
@@ -94,9 +100,6 @@ public class MemcachedRegionAccessStrategy implements RegionAccessStrategy {
     }
 
     /**
-     * Transaction 지원할 때는 evictAll()을 호출하는데 그렇게 하면 트랜잭션 시작전에 한번, 트랜잭션 종료후에 한 번 두번 evict가 호출된다.
-     * memcached와는 무관하다.
-     *
      * @see org.hibernate.cache.spi.access.RegionAccessStrategy#removeAll()
      */
     @Override
