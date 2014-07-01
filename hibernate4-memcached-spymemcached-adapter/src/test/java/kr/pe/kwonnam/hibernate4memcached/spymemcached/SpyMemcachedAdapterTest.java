@@ -129,9 +129,16 @@ public class SpyMemcachedAdapterTest {
         String cachedValue = "cached value";
         when(memcachedClient.get(givenNamespacedKey)).thenReturn(cachedValue);
 
-        Object actual = spyMemcachedAdapter.get(givenCacheNamespace, givenKey);
+        assertThat(spyMemcachedAdapter.get(givenCacheNamespace, givenKey)).isEqualTo(cachedValue);
+    }
 
-        assertThat(actual).isEqualTo(cachedValue);
+    @Test
+    public void get_null() throws Exception {
+        givenNamespaceAndKey(new CacheNamespace("authors", true), "authors#10", "hXm.authors@1:authors#10");
+
+        when(memcachedClient.get(givenNamespacedKey)).thenReturn(null);
+        assertThat(spyMemcachedAdapter.get(givenCacheNamespace, givenKey)).isNull();
+
     }
 
     @Test
