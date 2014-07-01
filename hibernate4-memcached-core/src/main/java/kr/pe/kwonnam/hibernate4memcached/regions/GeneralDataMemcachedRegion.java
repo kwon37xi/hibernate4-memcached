@@ -54,7 +54,7 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
         }
 
         if (!(cachedData instanceof CacheItem)) {
-            log.debug("get cachedDate is not CacheItem.");
+            log.debug("get cachedData is not CacheItem.");
             return cachedData;
         }
 
