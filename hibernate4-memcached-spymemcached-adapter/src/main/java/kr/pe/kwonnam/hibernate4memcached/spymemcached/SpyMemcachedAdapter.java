@@ -24,10 +24,13 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     public static final String OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".operation.timeout.millis";
     public static final String TRANSCODER_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".transcoder";
     public static final String CACHE_KEY_PREFIX_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".cachekey.prefix";
+    public static final String AUTH_GENERATOR_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".auth.generator";
+    public static final String AUTH_WAIT_TIME_MILLIS_PROPERTY_KEY = PROPERTY_KEY_PREFIX + ".auth.waittime.millis";
 
     public static final String NAMESPACE_NAME_SQUENCE_SEPARATOR = "@";
 
     public static final int DEFAULT_NAMESPACE_SEQUENCE_EXPIRY_SECONDS = Hibernate4MemcachedRegionFactory.MEMCACHED_MAX_EPIRY_SECONDS;
+    public static final long DEFAULT_AUTH_WAIT_TIME_MILLIS = 1000L;
 
     private Logger log = LoggerFactory.getLogger(SpyMemcachedAdapter.class);
 
@@ -82,7 +85,30 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
 
         String transcoderClassProperty = properties.getRequiredProperty(TRANSCODER_PROPERTY_KEY);
         builder.setTranscoder(createTranscoder(properties, transcoderClassProperty));
+
+        authenticate(builder, properties);
         return builder;
+    }
+
+    void authenticate(ConnectionFactoryBuilder builder, OverridableReadOnlyProperties properties) {
+        String authGeneratorClassName = properties.getProperty(AUTH_GENERATOR_PROPERTY_KEY);
+        if (StringUtils.isEmpty(authGeneratorClassName)) {
+            return;
+        }
+        try {
+            Class<AuthDescriptorGenerator> authGeneratorClass = (Class<AuthDescriptorGenerator>) Class.forName(authGeneratorClassName);
+            AuthDescriptorGenerator authDescriptorGenerator = authGeneratorClass.newInstance();
+            builder.setAuthDescriptor(authDescriptorGenerator.generate(properties));
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(authGeneratorClassName + " does not exists.", e);
+        } catch (InstantiationException e) {
+            throw new IllegalArgumentException(authGeneratorClassName + " class can not be instanticated", e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(authGeneratorClassName + " class can not be instanticated", e);
+        }
+
+        String authWaitTimeMillis = properties.getProperty(AUTH_WAIT_TIME_MILLIS_PROPERTY_KEY, String.valueOf(DEFAULT_AUTH_WAIT_TIME_MILLIS));
+        builder.setAuthWaitTime(Long.parseLong(authWaitTimeMillis));
     }
 
     private Transcoder<Object> createTranscoder(OverridableReadOnlyProperties properties, String transcoderClassProperty) {
@@ -101,7 +127,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
      * Return cache namespace decorated key.
      *
      * @param cacheNamespace cache namespace
-     * @param key            cache key
+     * @param key cache key
      * @return namespace infomation prefixed cache key
      */
     String getNamespacedKey(CacheNamespace cacheNamespace, String key) {

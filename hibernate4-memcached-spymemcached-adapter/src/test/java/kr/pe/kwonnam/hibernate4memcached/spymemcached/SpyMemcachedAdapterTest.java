@@ -4,6 +4,7 @@ import kr.pe.kwonnam.hibernate4memcached.memcached.CacheNamespace;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyProperties;
 import kr.pe.kwonnam.hibernate4memcached.util.OverridableReadOnlyPropertiesImpl;
 import net.spy.memcached.*;
+import net.spy.memcached.auth.AuthDescriptor;
 import net.spy.memcached.transcoders.Transcoder;
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,6 +61,7 @@ public class SpyMemcachedAdapterTest {
         props.setProperty(HASH_ALGORITHM_PROPERTY_KEY, DefaultHashAlgorithm.NATIVE_HASH.name());
         props.setProperty(OPERATION_TIMEOUT_MILLIS_PROPERTY_KEY, String.valueOf(13579));
         props.setProperty(TRANSCODER_PROPERTY_KEY, FakeTranscoder.class.getName());
+        props.setProperty(AUTH_GENERATOR_PROPERTY_KEY, FakeAuthDescriptorGenerator.class.getName());
 
         ConnectionFactoryBuilder builder = spyMemcachedAdapter.createConnectionFactoryBuilder(new OverridableReadOnlyPropertiesImpl(props));
 
@@ -71,6 +73,45 @@ public class SpyMemcachedAdapterTest {
         assertThat(transcoder).isExactlyInstanceOf(FakeTranscoder.class);
         FakeTranscoder fakeTranscoder = (FakeTranscoder) transcoder;
         assertThat(fakeTranscoder.isInitialized()).isTrue();
+
+        AuthDescriptor authDescriptor = connectionFactory.getAuthDescriptor();
+        assertThat(authDescriptor.getMechs()).isEqualTo(FakeAuthDescriptorGenerator.FAKE_MECHS);
+    }
+
+    @Test
+    public void authenticate_no_authentication_property() throws Exception {
+        Properties props = new Properties();
+        ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
+        spyMemcachedAdapter.authenticate(builder, new OverridableReadOnlyPropertiesImpl(props));
+
+        assertThat(builder.build().getAuthDescriptor()).isNull();
+    }
+
+    @Test
+    public void authenticate_with_authentication_proerty() throws Exception {
+        Properties props = new Properties();
+        props.setProperty(SpyMemcachedAdapter.AUTH_GENERATOR_PROPERTY_KEY, FakeAuthDescriptorGenerator.class.getName());
+
+        ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
+        spyMemcachedAdapter.authenticate(builder, new OverridableReadOnlyPropertiesImpl(props));
+
+        ConnectionFactory connectionFactory = builder.build();
+        assertThat(connectionFactory.getAuthDescriptor().getMechs()).isEqualTo(FakeAuthDescriptorGenerator.FAKE_MECHS);
+        assertThat(connectionFactory.getAuthWaitTime()).isEqualTo(SpyMemcachedAdapter.DEFAULT_AUTH_WAIT_TIME_MILLIS);
+    }
+
+    @Test
+    public void authenticate_with_authWaitTimeMillis_property() throws Exception {
+        Properties props = new Properties();
+        props.setProperty(SpyMemcachedAdapter.AUTH_GENERATOR_PROPERTY_KEY, FakeAuthDescriptorGenerator.class.getName());
+        props.setProperty(SpyMemcachedAdapter.AUTH_WAIT_TIME_MILLIS_PROPERTY_KEY, String.valueOf(9999L));
+
+        ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
+        spyMemcachedAdapter.authenticate(builder, new OverridableReadOnlyPropertiesImpl(props));
+
+        ConnectionFactory connectionFactory = builder.build();
+        assertThat(connectionFactory.getAuthDescriptor().getMechs()).isEqualTo(FakeAuthDescriptorGenerator.FAKE_MECHS);
+        assertThat(connectionFactory.getAuthWaitTime()).isEqualTo(9999L);
     }
 
     @Test
@@ -247,6 +288,15 @@ public class SpyMemcachedAdapterTest {
         @Override
         public void init(OverridableReadOnlyProperties properties) {
             initialized = true;
+        }
+    }
+
+    public static class FakeAuthDescriptorGenerator implements AuthDescriptorGenerator {
+        public static final String[] FAKE_MECHS = new String[] {"fake", "mechs"};
+
+        @Override
+        public AuthDescriptor generate(OverridableReadOnlyProperties properties) {
+            return new AuthDescriptor(FAKE_MECHS, null);
         }
     }
 }
