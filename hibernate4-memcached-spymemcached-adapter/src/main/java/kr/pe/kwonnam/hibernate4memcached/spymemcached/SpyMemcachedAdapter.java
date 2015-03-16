@@ -201,7 +201,7 @@ public class SpyMemcachedAdapter implements MemcachedAdapter {
     @Override
     public void evictAll(CacheNamespace cacheNamespace) {
         if (!cacheNamespace.isNamespaceExpirationRequired()) {
-            log.debug("spymemcachedadapter region evict {} nothins done, because regionExpirationRequired == false.", cacheNamespace);
+            log.debug("spymemcachedadapter region evict {} nothings done, because regionExpirationRequired == false.", cacheNamespace);
             return;
         }
 

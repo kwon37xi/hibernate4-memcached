@@ -58,6 +58,10 @@ public class EntityTestUtils {
         emf.close();
     }
 
+	public static EntityManagerFactory getEntityManagerFactory() {
+		return emf;
+	}
+
     public static EntityManager start() {
         return emf.createEntityManager();
     }

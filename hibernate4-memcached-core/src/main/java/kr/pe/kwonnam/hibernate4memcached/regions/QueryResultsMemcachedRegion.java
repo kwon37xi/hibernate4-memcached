@@ -20,7 +20,7 @@ public class QueryResultsMemcachedRegion extends GeneralDataMemcachedRegion impl
 
     public QueryResultsMemcachedRegion(String regionName, OverridableReadOnlyProperties properties, Settings settings,
                                        MemcachedAdapter memcachedAdapter, HibernateCacheTimestamper hibernateCacheTimestamper) {
-        super(new CacheNamespace(regionName, false), properties, null, settings, memcachedAdapter, hibernateCacheTimestamper);
+        super(new CacheNamespace(regionName, true), properties, null, settings, memcachedAdapter, hibernateCacheTimestamper);
     }
 
     /**
