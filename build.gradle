@@ -19,7 +19,7 @@ subprojects {
     apply plugin: 'jacoco'
 
     group = 'kr.pe.kwonnam.hibernate4memcached'
-    version = '0.7'
+    version = '0.8-SNAPSHOT'
 
     repositories {
         mavenCentral()
@@ -76,17 +76,29 @@ configure(subprojects.findAll { ['hibernate4-memcached-core', 'hibernate4-memcac
         sign configurations.archives
     }
 
-    uploadArchives {
+	def uploadArchiveUsername = '--unknown username--'
+	def uploadArchivePassword = '--unknown password--'
+
+	if (project.hasProperty('ossrhUsername')) {
+		uploadArchiveUsername = ossrhUsername
+	}
+
+	if (project.hasProperty('ossrhPassword')) {
+		uploadArchivePassword = ossrhPassword
+	}
+
+	uploadArchives {
         repositories {
             mavenDeployer {
                 beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
                 repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                    authentication(userName: uploadArchiveUsername, password: uploadArchivePassword)
                 }
 
                 snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                    authentication(userName: uploadArchiveUsername, password: uploadArchivePassword)
+                    authentication(userName: uploadArchiveUsername, password: uploadArchivePassword)
                 }
 
                 pom.project {
