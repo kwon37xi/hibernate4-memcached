@@ -1,4 +1,5 @@
 # hibernate4-memcached
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/kr.pe.kwonnam.hibernate4memcached/hibernate4-memcached-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/kr.pe.kwonnam.hibernate4memcached/hibernate4-memcached-core)
 
 Hibernate 4 Memcached Second Level Cache Implementation
 
