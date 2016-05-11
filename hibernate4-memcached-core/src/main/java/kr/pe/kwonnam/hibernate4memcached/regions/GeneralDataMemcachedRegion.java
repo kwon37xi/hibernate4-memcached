@@ -47,7 +47,14 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
         String refinedKey = refineKey(key);
 
         log.debug("Cache get [{}] : key[{}]", getCacheNamespace(), refinedKey);
-        Object cachedData = getMemcachedAdapter().get(getCacheNamespace(), refinedKey);
+
+        Object cachedData;
+        try {
+            cachedData = getMemcachedAdapter().get(getCacheNamespace(), refinedKey);
+        } catch (Exception ex) {
+            log.warn("Failed to get from memcached.", ex);
+            cachedData = null;
+        }
 
         if (cachedData == null) {
             return null;
@@ -83,20 +90,32 @@ public class GeneralDataMemcachedRegion extends MemcachedRegion implements Gener
         String refinedKey = refineKey(key);
         log.debug("Cache put [{}] : key[{}], value[{}], classVersionApplicable : {}", getCacheNamespace(), refinedKey,
                 valueToCache, classVersionApplicable);
-        getMemcachedAdapter().set(getCacheNamespace(), refinedKey, valueToCache, getExpiryInSeconds());
+        try {
+            getMemcachedAdapter().set(getCacheNamespace(), refinedKey, valueToCache, getExpiryInSeconds());
+        } catch (Exception ex) {
+            log.warn("Failed to set memcached value.", ex);
+        }
     }
 
     @Override
     public void evict(Object key) throws CacheException {
         String refinedKey = refineKey(key);
         log.debug("Cache evict[{}] : key[{}]", getCacheNamespace(), refinedKey);
-        getMemcachedAdapter().delete(getCacheNamespace(), refinedKey);
+        try {
+            getMemcachedAdapter().delete(getCacheNamespace(), refinedKey);
+        } catch (Exception ex) {
+            log.warn("Failed to delete memcached value.", ex);
+        }
     }
 
     @Override
     public void evictAll() throws CacheException {
         log.debug("Cache evictAll [{}].", getCacheNamespace());
-        getMemcachedAdapter().evictAll(getCacheNamespace());
+        try {
+            getMemcachedAdapter().evictAll(getCacheNamespace());
+        } catch (Exception ex) {
+            log.warn("Failed to evictAll.", ex);
+        }
     }
 
     /**

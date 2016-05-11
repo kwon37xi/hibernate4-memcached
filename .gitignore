@@ -12,3 +12,5 @@ target/
 .settings/
 classes/
 out/
+/.nb-gradle/
+bin/

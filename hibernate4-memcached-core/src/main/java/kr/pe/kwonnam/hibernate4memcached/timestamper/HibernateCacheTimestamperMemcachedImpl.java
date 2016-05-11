@@ -56,8 +56,16 @@ public class HibernateCacheTimestamperMemcachedImpl implements HibernateCacheTim
 
     @Override
     public long next() {
-        long next = memcachedAdapter.increaseCounter(cacheNamespace, TIMESTAMP_KEY, INCREASE_BY,
-                System.currentTimeMillis(), EXPIRY_SECONDS);
+        final long defaultNext = System.currentTimeMillis();
+        long next;
+        try {
+            next = memcachedAdapter.increaseCounter(cacheNamespace, TIMESTAMP_KEY, INCREASE_BY,
+                    defaultNext, EXPIRY_SECONDS);
+        } catch (Exception ex) {
+            log.warn("Failed to increase counter to get next timestamper.", ex);
+            next = defaultNext;
+        }
+
         log.debug("hibernate cache timestamper next : {}", next);
         return next;
     }
